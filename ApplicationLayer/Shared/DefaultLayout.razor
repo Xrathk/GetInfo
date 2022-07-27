@@ -1,0 +1,49 @@
+﻿@inherits LayoutComponentBase
+@using System.IO
+
+
+<!-- Default layout (not connected users) -->
+
+<PageTitle>GetInfo</PageTitle>
+
+<section class="bg-image" style="background-image: url(@backgroundPic); background-size: cover; height: 100vh">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-dark text-white" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <article class="content px-4">
+                <img src="/Pictures/SiteLogo2.png" class="rounded-circle" style="width: 200px; height: 150px; margin-bottom:2rem" alt="GetInfo">
+                @Body
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+@code {
+    private string backgroundPic;
+
+    /// <summary>
+    /// Choosing random background pic for default screen from resources.
+    /// </summary>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        /// ***** METHOD BELOW MUST BE TAKEN TO LOGIC LAYER ***** ///
+
+        // Pick file at random based on hour
+        var hour = DateTime.Now.Hour;
+        var allFiles = Directory.GetFiles("Resources/Pictures/DefaultBackground");
+        var randomFile = allFiles[hour % allFiles.Length];
+
+        // Get correct filename, load pic
+        randomFile = randomFile.Replace('\\','/');
+        backgroundPic = randomFile.Substring(randomFile.IndexOf('/'));
+        StateHasChanged(); // Verify change
+        
+        //await jsRuntime.InvokeAsync<string>("console.log", randomFile); // Printing output to console (DOES IT AFTER EVERY RENDER)
+    }
+}

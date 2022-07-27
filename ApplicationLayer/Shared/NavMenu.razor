@@ -1,0 +1,48 @@
+﻿<!-- Navigation bar (connected users) -->
+
+<nav class="shadow-lg navbar navbar-expand-lg navbar-dark bg-primary">
+
+    <div class="navbar-nav" style="float:none;margin:0 auto;text-align: center;">
+      <a class="nav-item nav-link" href="home" style="margin-top:-0.5rem;margin-left:11rem"><span class="oi oi-home" aria-hidden="true"></span><br /><b>Home</b></a>
+      <a class="nav-item nav-link" href="weather"><span class="oi oi-sun" aria-hidden="true"></span><br /><b>Weather</b></a>
+      <a class="nav-item nav-link" href="news"><span class="oi oi-list-rich" aria-hidden="true"></span><br /><b>News</b></a>
+      <a class="nav-item nav-link" href="sportscores"><span class="oi oi-flash" aria-hidden="true"></span><br /><b>Live Scores</b></a>
+      <a class="nav-item nav-link" href="places" style="margin-top:0.1rem"><span class="oi oi-map" aria-hidden="true"></span><br /><b>Places</b></a>
+      <a class="nav-item nav-link" href="investments" style="margin-top:0.1rem"><span class="oi oi-graph" aria-hidden="true"></span><br /><b>Investments</b></a>
+      <a class="nav-item nav-link" href="encyclopedia" style="margin-top:0.1rem"><span class="oi oi-book" aria-hidden="true"></span><br /><b>Encyclopedia</b></a>
+      <a class="nav-item nav-link" href="wallpapers"><span class="oi oi-image" aria-hidden="true"></span><br /><b>Wallpapers</b></a>
+      <a class="nav-item nav-link" href="forum"><span class="oi oi-comment-square" aria-hidden="true"></span><br /><b>Forum</b></a>
+     </div>
+
+     <div style="margin-bottom:0.7rem;position:relative;margin-right:1rem">
+        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-top:0.8rem">
+            <span class="oi oi-person" aria-hidden="true"></span>&emsp;<b>My Account&nbsp;</b>
+        </button>
+        <div class="dropdown-menu" style="margin-left:1rem">
+            <a class="dropdown-item" href="myaccount">Summary</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" @onclick="() => LogOut()" style="cursor:pointer">Log out</a>
+        </div>
+     </div>
+
+</nav>
+
+@code {
+
+    /// <summary>
+    /// Clears out session data, logs out user
+    /// </summary>
+    private async Task LogOut()
+    {
+        // Check if cookie exists, then delete
+        if ((await ProtectedSessionStore.GetAsync<string>("SessionId")).Success) 
+        {
+            // Move back to login page, clear session variables
+            await ProtectedSessionStore.DeleteAsync("SessionId");
+            UriHelper.NavigateTo("/login");
+
+        }
+        
+    }
+}
+

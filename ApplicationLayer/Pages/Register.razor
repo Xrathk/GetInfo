@@ -1,0 +1,124 @@
+﻿@page "/register"
+@layout DefaultLayout
+@using LogicLayer.Data.Forms
+@using DataAccessLayer.Models.StatusEnums
+
+<!-- Register page -->
+
+<PageTitle>GetInfo Sign-up</PageTitle>
+
+<!-- Generic login page (sign in with credentials, or register) -->
+<div class="mb-md-1 mt-md-1 pb-2">
+
+    <h4 class="fw-bold mb-2">Sign-up to GetInfo</h4>
+    <p class="text-white-50 mb-2">Signing up to GetInfo takes less than a minute. Enter your credentials below!</p>
+
+    <EditForm Model="@regForm" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+          <form>
+          <div class="form-group row mb-2">
+            <label for="regEmail" class="col-sm-4 col-form-label" style="font-weight:bold">E-Mail</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="regEmail" placeholder="e.g. abc@gmail.com" @bind-value="regForm.Email">
+            </div>
+          </div>
+          <div class="form-group row mb-2">
+            <label for="regUsername" class="col-sm-4 col-form-label" style="font-weight:bold">Username</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="regUsername" placeholder="e.g. User123" @bind-value="regForm.Username">
+            </div>
+          </div>
+          <div class="form-group row mb-2">
+            <label for="regPass" class="col-sm-4 col-form-label" style="font-weight:bold">Password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" id="regPass" placeholder="Password" @bind-value="regForm.Password">
+            </div>
+          </div>
+          <div class="form-group row mb-2">
+            <label for="regPassRepeat" class="col-sm-4 col-form-label" style="font-weight:bold; margin-top:-11px">Confirm Password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" id="regPassRepeat" placeholder="Password" @bind-value="regForm.PasswordRepeat">
+            </div>
+          </div>
+        </form>
+
+        <button class="btn btn-outline-light btn-lg px-5" type="submit">Register</button>
+    </EditForm>
+    
+    @if (formStatus == FormSubmissionStatus.CurrentlyProcessed)
+    {
+        <br />
+        <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    }
+    else if (formStatus == FormSubmissionStatus.Rejected)
+    {
+        <br />
+        <div class="alert alert-danger fw-bold" role="alert">
+            @submissionMessage
+        </div>
+    }
+    else if (formStatus == FormSubmissionStatus.Accepted)
+    {
+        <br />
+        <div class="alert alert-success fw-bold" role="alert">
+            @submissionMessage Try <a href="login" class="text-blue-50 fw-bold">logging in</a>!
+        </div>
+    }
+
+</div>
+<div>
+    <p class="mb-0">Already have an account? <a href="login" class="text-white-50 fw-bold">Login</a>
+    </p>
+</div>
+
+
+
+@code {
+    private FormSubmissionStatus formStatus = FormSubmissionStatus.NotSent;
+    private string submissionMessage = "";
+
+    private RegisterForm regForm = new RegisterForm();
+
+    // Handling valid registration info
+    private async Task HandleValidSubmit()
+    {
+        formStatus = FormSubmissionStatus.CurrentlyProcessed;
+        // Process the valid form
+        await jsRuntime.InvokeAsync<string>("console.log", "Valid registration data sent"); 
+        var code = AccountOperations.RegisterAccount(regForm);
+        await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(code));
+        // Create appropriate message based on result of valid form
+        if (code == 0) // Successful account creation
+        {
+            formStatus = FormSubmissionStatus.Accepted;
+            submissionMessage = "Account successfully created! ";
+        }
+        else if (code == 1) // Username already exists
+        {
+            formStatus = FormSubmissionStatus.Rejected;
+            submissionMessage = ErrorCodes.FindDescription(code);
+        }
+        else if (code == 2) // Password already exists
+        {
+            formStatus = FormSubmissionStatus.Rejected;
+            submissionMessage = ErrorCodes.FindDescription(code);
+        }
+
+    }
+
+    // Handling invalid registration info
+    private async Task HandleInvalidSubmit()
+    {
+
+        // Process the invalid form
+        await jsRuntime.InvokeAsync<string>("console.log", regForm.Email); 
+        await jsRuntime.InvokeAsync<string>("console.log", regForm.Username); 
+        await jsRuntime.InvokeAsync<string>("console.log", regForm.Password); 
+        await jsRuntime.InvokeAsync<string>("console.log", regForm.PasswordRepeat); 
+    }
+
+}

@@ -1,0 +1,51 @@
+﻿@page "/home"
+@page "/index"
+@page "/"
+
+
+<!-- Await for authorization -->
+@if (!authorized)
+{
+    <StandbyForAuthorization />
+} 
+else 
+{
+    <!-- Proceed to page -->
+    <!-- Main page (connected users) -->
+    <PageTitle>Home</PageTitle>
+    
+    <h1>Hello, world!</h1>
+
+    <p>Welcome to your new app.</p>
+
+}
+
+
+
+@code {
+
+    private bool authorized = false; // Authorization variable
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initial cookie check
+        var cookieValidity = await AccountOperations.VerifyAuthenticationCookie(ProtectedSessionStore);
+        if (cookieValidity == 0) // Cookie valid
+        {
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            authorized = true;
+        }
+        else // Cookie invalid
+        {
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            UriHelper.NavigateTo("/login");
+        }
+        StateHasChanged(); // Update component
+
+        // Continue
+
+
+    }
+
+}
+
