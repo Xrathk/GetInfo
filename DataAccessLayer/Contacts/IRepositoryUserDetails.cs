@@ -7,6 +7,11 @@ namespace DataAccessLayer.Contacts
     /// </summary>
     public interface IRepositoryUserDetails : IRepository<UserDetails>
     {
-        public UserDetails GetByUserId(int appUserId); // Retrieve details by user Id
+        /// <summary>
+        /// Retrieves user details by the user's Id.
+        /// </summary>
+        /// <param name="appUserId">User Id parameter</param>
+        /// <returns></returns>
+        public UserDetails GetByUserId(int appUserId); 
     }
 }

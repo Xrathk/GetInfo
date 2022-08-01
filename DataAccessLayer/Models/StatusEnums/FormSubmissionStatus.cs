@@ -1,5 +1,8 @@
 ﻿namespace DataAccessLayer.Models.StatusEnums
 {
+    /// <summary>
+    /// Web form submission statuses.
+    /// </summary>
     public enum FormSubmissionStatus
     {
         NotSent = 0,

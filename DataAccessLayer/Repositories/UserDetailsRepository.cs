@@ -13,7 +13,11 @@ namespace DataAccessLayer.Repositories
         private readonly GetInfoDbContext dbContext;
         private readonly ILogger _logger;
 
-        // Constructor
+        /// <summary>
+        /// User details repository constructor.
+        /// </summary>
+        /// <param name="_dbContext">Database context</param>
+        /// <param name="logger">Logger component</param>
         public RepositoryUserDetails(GetInfoDbContext _dbContext, ILogger<UserDetails> logger)
         {
             dbContext = _dbContext;
@@ -33,7 +37,7 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add<UserDetails>(UserDetails);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("User details with ID \"{userId}\" successfully stored to database.", obj.Entity.Id);
+                    _logger.LogInformation("User details initiated successfully:\n User Id: {id}, First name: {fName}, Last name: {lName}, Age: {age}, Country of origin: {countryOfOrigin}, Location: {location}", obj.Entity.AppUserId, obj.Entity.FirstName, obj.Entity.LastName, obj.Entity.Age, obj.Entity.CountryOfOrigin, obj.Entity.CurrentLocation);
                     return obj.Entity;
                 }
                 else
@@ -43,7 +47,7 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new user details with ID \"{detId}\" to database. Exception: {Ex}", UserDetails.Id, Ex);
+                _logger.LogInformation("Could not store new user details for user with ID \"{userId}\" to database. Exception: {Ex}", UserDetails.AppUserId, Ex);
                 return null;
             }
         }
@@ -62,13 +66,13 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("User details with ID \"{userId}\" has been deleted from the database succesfully.", obj.Entity.Id);
+                        _logger.LogInformation("User details for user with ID \"{userId}\" have been deleted from the database successfully.", obj.Entity.AppUserId);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not delete user details with ID \"{userId}\" from database. Exception: {Ex}", UserDetails.Id, Ex);
+                _logger.LogInformation("Could not delete user details for user with ID \"{userId}\" from database. Exception: {Ex}", UserDetails.AppUserId, Ex);
             }
         }
 
@@ -145,13 +149,13 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("User details with ID \"{userId}\" has been updated succesfully.", obj.Entity.Id);
+                        _logger.LogInformation("User details updated successfully. New properties:\n User Id: {id}, First name: {fName}, Last name: {lName}, Age: {age}, Country of origin: {countryOfOrigin}, Location: {location}", obj.Entity.AppUserId, obj.Entity.FirstName, obj.Entity.LastName, obj.Entity.Age, obj.Entity.CountryOfOrigin, obj.Entity.CurrentLocation);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not update info for user details with ID \"{detId}\". Exception: {Ex}", UserDetails.Id, Ex);
+                _logger.LogInformation("Could not update info for user details for user with ID \"{userId}\" . Exception: {Ex}", UserDetails.AppUserId, Ex);
             }
         }
     }

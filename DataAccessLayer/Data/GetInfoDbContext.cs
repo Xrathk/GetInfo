@@ -10,9 +10,12 @@ namespace DataAccessLayer.Data
     public class GetInfoDbContext : DbContext
     {
 
-        public static string connectionString;
+        public static string connectionString; // DB connection string
 
-        // Getting connection string from configuration file
+        /// <summary>
+        /// GetInfo database context constructor.
+        /// </summary>
+        /// <param name="config">App configuration (for getting database connection string)</param>
         public GetInfoDbContext(IConfiguration config)
         {
             connectionString = config.GetValue<string>("DbConnectionString");
@@ -23,7 +26,10 @@ namespace DataAccessLayer.Data
         }
 
 
-        // Configuring database
+        /// <summary>
+        /// Database configuration override function.
+        /// </summary>
+        /// <param name="optionsBuilder">DbContext options</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString);
@@ -36,7 +42,10 @@ namespace DataAccessLayer.Data
         public DbSet<UserDetails> UserDetails { get; set; }
 
 
-        // Entry CRUD operation specifics
+        /// <summary>
+        /// Database entry operation specifics.
+        /// </summary>
+        /// <param name="modelBuilder">Model builder</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Primary keys

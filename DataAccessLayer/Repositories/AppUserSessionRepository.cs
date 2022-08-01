@@ -13,7 +13,11 @@ namespace DataAccessLayer.Repositories
         private readonly GetInfoDbContext dbContext;
         private readonly ILogger _logger;
 
-        // Constructor
+        /// <summary>
+        /// Session repository constructor.
+        /// </summary>
+        /// <param name="_dbContext">Database context</param>
+        /// <param name="logger">Logger component</param>
         public RepositoryAppUserSession(GetInfoDbContext _dbContext, ILogger<AppUserSession> logger)
         {
             dbContext = _dbContext;
@@ -33,7 +37,7 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add<AppUserSession>(AppUserSession);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("New session initialized. User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
+                    _logger.LogInformation("New session initialized.\n User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
                     return obj.Entity;
                 }
                 else
@@ -62,7 +66,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("Session info deleted. User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
+                        _logger.LogInformation("Session info deleted.\n User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
                     }
                 }
             }
@@ -165,7 +169,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("Session info updated. User ID: {userId}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
+                        _logger.LogInformation("Session info updated.\n User ID: {userId}, Session ID: {sessId}, Session active: {sessStatus}", obj.Entity.AppUserID, obj.Entity.SessionId, obj.Entity.SessionActive);
                     }
                 }
             }

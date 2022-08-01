@@ -114,7 +114,7 @@
     private async Task HandleInvalidSubmit()
     {
 
-        // Process the invalid form
+        // Process the invalid form (debug messages)
         await jsRuntime.InvokeAsync<string>("console.log", regForm.Email); 
         await jsRuntime.InvokeAsync<string>("console.log", regForm.Username); 
         await jsRuntime.InvokeAsync<string>("console.log", regForm.Password); 

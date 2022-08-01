@@ -15,7 +15,11 @@ namespace DataAccessLayer
         private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<OneTimeMethods> Logger;
 
-        // Service constructor
+        /// <summary>
+        /// Service constructor.
+        /// </summary>
+        /// <param name="_scopeFactory">Scope factory</param>
+        /// <param name="logger">Logger component</param>
         public OneTimeMethods(IServiceScopeFactory _scopeFactory, ILogger<OneTimeMethods> logger)
         {
             scopeFactory = _scopeFactory;

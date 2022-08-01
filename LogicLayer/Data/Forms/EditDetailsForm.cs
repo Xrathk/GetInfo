@@ -3,7 +3,7 @@
 namespace LogicLayer.Data.Forms
 {
     /// <summary>
-    /// Model for detail editing form.
+    /// Model for user detail editing form.
     /// </summary>
     public class EditDetailsForm
     {

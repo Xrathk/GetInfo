@@ -10,7 +10,9 @@ namespace LogicLayer.Services
         // List of errors
         public List<AppError> AppErrors { get; set; } 
 
-        // Constructor - runs on app startup
+        /// <summary>
+        /// Constructor. Initializes error list on app start-up.
+        /// </summary>
         public ErrorCodes()
         {
             AppErrors = InitializeErrorList();

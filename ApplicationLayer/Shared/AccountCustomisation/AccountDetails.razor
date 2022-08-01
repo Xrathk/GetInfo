@@ -92,7 +92,7 @@
     <div  class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style="float:right">
         @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
         {
-            <button type="button" class="btn btn-info fw-bold" style="color:floralwhite" @onclick="() => formAvailabilty = FormAvailabilityStatus.Editable">Update account details</button>
+            <button type="button" class="btn btn-info fw-bold" style="color:floralwhite" @onclick="@(() => {formAvailabilty = FormAvailabilityStatus.Editable; formStatus = FormSubmissionStatus.NotSent;})">Update account details</button>
         }
         @if (formAvailabilty == FormAvailabilityStatus.Editable)
             {
@@ -102,8 +102,7 @@
     </div>
 
 </EditForm>
-Country is @selectedCountry
-form is @detailsForm.CountryOfOrigin
+
 @if (formStatus == FormSubmissionStatus.CurrentlyProcessed)
 {
     <br />
@@ -146,7 +145,7 @@ else if (formStatus == FormSubmissionStatus.Accepted)
 
     void OnSelect (ChangeEventArgs e)
     {
-            selectedCountry = e.Value.ToString();
+        selectedCountry = e.Value.ToString();
     }
 
 
@@ -163,14 +162,13 @@ else if (formStatus == FormSubmissionStatus.Accepted)
         {
             submissionMessage = "Account details stored successfully!";
             formStatus = FormSubmissionStatus.Accepted;
+            formAvailabilty = FormAvailabilityStatus.NotEditable;
         }
         else
         {
             submissionMessage = "Failed to store new account details.";
             formStatus = FormSubmissionStatus.Rejected;
         }
-
-
     }
 
     // Handling invalid details update info

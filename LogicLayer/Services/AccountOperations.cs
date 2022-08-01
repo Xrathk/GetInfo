@@ -4,11 +4,8 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using DataAccessLayer.Models.Entities;
-using DataAccessLayer.Models.StatusEnums;
 using LogicLayer.Data.Forms;
 using DataAccessLayer.Contacts;
-using DataAccessLayer.Repositories;
-using DataAccessLayer.Data;
 
 namespace LogicLayer.Services
 {
@@ -26,7 +23,14 @@ namespace LogicLayer.Services
         public readonly IRepositoryAppUserSession _sessionRepo;
         public readonly IRepositoryUserDetails _userDetailsRepo;
 
-        // Service constructor
+        /// <summary>
+        /// Service constuctor.
+        /// </summary>
+        /// <param name="_scopeFactory">Score factory</param>
+        /// <param name="logger">Logger component</param>
+        /// <param name="userRepo">User model repository</param>
+        /// <param name="sessionRepo">Session model repository</param>
+        /// <param name="userDetailsRepo">User details model repository</param>
         public AccountOperations(
             IServiceScopeFactory _scopeFactory, 
             ILogger<AccountOperations> logger, 
@@ -40,8 +44,6 @@ namespace LogicLayer.Services
             _userRepo = userRepo;
             _sessionRepo = sessionRepo;
             _userDetailsRepo = userDetailsRepo;
-
-            Logger.LogInformation("Account operations up and running.");
 
         }
 
@@ -295,9 +297,6 @@ namespace LogicLayer.Services
             Logger.LogInformation("User with ID {appUserId} has modified their account details.", AppUserId); ;
             return true; // All information is accepted, for the moment
         }
-
-
-
 
 
     }

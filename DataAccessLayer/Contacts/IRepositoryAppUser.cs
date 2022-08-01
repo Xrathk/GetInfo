@@ -7,6 +7,11 @@ namespace DataAccessLayer.Contacts
     /// </summary>
     public interface IRepositoryAppUser : IRepository<AppUser>
     {
-        public AppUser GetByUsername(string username); // Retrieve user by username
+        /// <summary>
+        /// Retrieves a user by his username.
+        /// </summary>
+        /// <param name="username">Username parameter</param>
+        /// <returns></returns>
+        public AppUser GetByUsername(string username); 
     }
 }

@@ -13,7 +13,11 @@ namespace DataAccessLayer.Repositories
         private readonly GetInfoDbContext dbContext;
         private readonly ILogger _logger;
 
-        // Constructor
+        /// <summary>
+        /// User repository constructor.
+        /// </summary>
+        /// <param name="_dbContext">Database context</param>
+        /// <param name="logger">Logger component</param>
         public RepositoryAppUser(GetInfoDbContext _dbContext, ILogger<AppUser> logger)
         {
             dbContext = _dbContext;
@@ -33,7 +37,7 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add<AppUser>(appuser);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("User with ID \"{userId}\" successfully stored to database.", obj.Entity.Id);
+                    _logger.LogInformation("User added to database:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     return obj.Entity;
                 }
                 else
@@ -43,7 +47,7 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new user with ID \"{userId}\" to database. Exception: {Ex}", appuser.Id, Ex);
+                _logger.LogInformation("Could not store new user to database. Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -62,7 +66,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("User with ID \"{userId}\" has been deleted from the database succesfully.", obj.Entity.Id);
+                        _logger.LogInformation("User deleted from database successfully to database:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     }
                 }
             }
@@ -145,7 +149,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("User with ID \"{userId}\" has been updated succesfully.", obj.Entity.Id);
+                        _logger.LogInformation("User info updated successfully. New properties:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     }
                 }
             }

@@ -1,3 +1,4 @@
+// Country picker component
 function AddCountrypicker() {
     var countries = [
             {
