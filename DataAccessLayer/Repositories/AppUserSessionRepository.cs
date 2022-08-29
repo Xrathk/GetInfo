@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace DataAccessLayer.Repositories
 {
     /// <summary>
-    /// User sessions repository method.
+    /// User sessions repository class.
     /// </summary>
     public class RepositoryAppUserSession : IRepositoryAppUserSession
     {
@@ -35,7 +35,7 @@ namespace DataAccessLayer.Repositories
             {
                 if (AppUserSession != null)
                 {
-                    var obj = dbContext.Add<AppUserSession>(AppUserSession);
+                    var obj = dbContext.Add(AppUserSession);
                     await dbContext.SaveChangesAsync();
                     _logger.LogInformation("New session initialized.\n User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
                     return obj.Entity;

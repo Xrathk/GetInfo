@@ -1,0 +1,25 @@
+﻿.card {
+    width:40%;
+    margin:auto;
+    background-color:darkslateblue;
+    border-radius:10px;
+}
+
+img {
+    width: 100px;
+    height: 77px;
+    border-radius: 8px;
+}
+
+.card #p1 {
+    font-size:26px;
+    margin-top:1.5rem;
+    color:floralwhite;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.card #p2 {
+    color: floralwhite;
+    font-family: Tahoma;
+    font-size: 20px;
+}

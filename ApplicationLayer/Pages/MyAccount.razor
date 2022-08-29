@@ -1,9 +1,9 @@
 ﻿@page "/myaccount"
 
 <!-- Await for authorization -->
-@if (!authorized)
+@if (AuthLevel == AuthorizationLevel.NotAuthorized)
 {
-    <StandbyForAuthorization />
+    <BallLoader />
 } 
 else
 {
@@ -111,7 +111,7 @@ else
         Help
     }
 
-    private bool authorized = false; // Authorization variable
+    private AuthorizationLevel AuthLevel = AuthorizationLevel.NotAuthorized; // Authorization status
     private int AppUserId = 0; // User ID by cookie
 
     protected override async Task OnInitializedAsync()
@@ -122,7 +122,7 @@ else
         {
             // Authorize user and find his ID
             await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
-            authorized = true;
+            AuthLevel = AuthorizationLevel.User;
             var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
             AppUserId = await AccountOperations.FetchUserBySessionId(userCookie);
         }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace DataAccessLayer.Repositories
 {
     /// <summary>
-    /// App user repository method.
+    /// App user repository class.
     /// </summary>
     public class RepositoryAppUser : IRepositoryAppUser
     {
@@ -35,7 +35,7 @@ namespace DataAccessLayer.Repositories
             {
                 if (appuser != null) 
                 {
-                    var obj = dbContext.Add<AppUser>(appuser);
+                    var obj = dbContext.Add(appuser);
                     await dbContext.SaveChangesAsync();
                     _logger.LogInformation("User added to database:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     return obj.Entity;
@@ -66,7 +66,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("User deleted from database successfully to database:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
+                        _logger.LogInformation("User deleted from database successfully:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     }
                 }
             }

@@ -11,12 +11,14 @@
 @*Project usings*@
 @using ApplicationLayer
 @using ApplicationLayer.Shared
+@using ApplicationLayer.Shared.Loaders
 
 @*Useful libraries and services*@
 @inject NavigationManager UriHelper
 @inject IJSRuntime jsRuntime  
 @inject LogicLayer.Services.ErrorCodes ErrorCodes
 @inject LogicLayer.Services.AccountOperations AccountOperations
+@using DataAccessLayer.Models.StatusEnums
 
 @*Session storage*@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace DataAccessLayer.Repositories
 {
     /// <summary>
-    /// User details repository method.
+    /// User details repository class.
     /// </summary>
     public class RepositoryUserDetails : IRepositoryUserDetails
     {
@@ -35,7 +35,7 @@ namespace DataAccessLayer.Repositories
             {
                 if (UserDetails != null)
                 {
-                    var obj = dbContext.Add<UserDetails>(UserDetails);
+                    var obj = dbContext.Add(UserDetails);
                     await dbContext.SaveChangesAsync();
                     _logger.LogInformation("User details initiated successfully:\n User Id: {id}, First name: {fName}, Last name: {lName}, Age: {age}, Country of origin: {countryOfOrigin}, Location: {location}", obj.Entity.AppUserId, obj.Entity.FirstName, obj.Entity.LastName, obj.Entity.Age, obj.Entity.CountryOfOrigin, obj.Entity.CurrentLocation);
                     return obj.Entity;

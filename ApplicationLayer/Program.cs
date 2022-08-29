@@ -31,9 +31,12 @@ builder.Logging.AddProvider(new SerilogLoggerProvider()); // Add serilog logging
 builder.Services.AddScoped<IRepositoryAppUser, RepositoryAppUser>();
 builder.Services.AddScoped<IRepositoryAppUserSession, RepositoryAppUserSession>();
 builder.Services.AddScoped<IRepositoryUserDetails, RepositoryUserDetails>();
+builder.Services.AddScoped<IRepositoryAppUserRequests, RepositoryAppUserRequests>();
+builder.Services.AddScoped<IRepositoryWeatherRequest, RepositoryWeatherRequest>();
 // BLL Services (+ optional DAL service)
 builder.Services.AddSingleton<ErrorCodes>(); // Add error codes
 builder.Services.AddTransient<AccountOperations>(); // Add account operations service
+builder.Services.AddTransient<WeatherApiOperations>(); // Add weather API operations service
 if (builder.Environment.IsDevelopment()) // Add one-time operations service (not for production environment)
 {
     builder.Services.AddSingleton<OneTimeMethods>(); 
