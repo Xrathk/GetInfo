@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add logging 
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+builder.AddLogging();
 
 /// <summary>
 /// Add services to application service container.
