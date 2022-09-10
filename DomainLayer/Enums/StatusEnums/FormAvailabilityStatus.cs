@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer.Models.StatusEnums
+﻿namespace DomainLayer.Enums.StatusEnums
 {
     /// <summary>
     /// Web form availability statuses.

@@ -1,6 +1,6 @@
 ﻿using DataAccessLayer.Contacts;
 using DataAccessLayer.Data;
-using DataAccessLayer.Models.Entities;
+using DomainLayer.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace DataAccessLayer.Repositories

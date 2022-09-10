@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
     <ProjectReference Include="..\LogicLayer\LogicLayer.csproj" />
+	<ProjectReference Include="..\DomainLayer\DomainLayer.csproj" />
   </ItemGroup>
 
 </Project>

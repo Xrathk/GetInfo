@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataAccessLayer.Contacts;
-using DataAccessLayer.Models.Entities;
+using DomainLayer.Entities;
 using LogicLayer.Data.ApiObjects.WeatherAPI;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

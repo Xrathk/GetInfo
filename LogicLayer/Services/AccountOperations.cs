@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using DataAccessLayer.Models.Entities;
+using DomainLayer.Entities;
 using LogicLayer.Data.Forms;
 using DataAccessLayer.Contacts;
 

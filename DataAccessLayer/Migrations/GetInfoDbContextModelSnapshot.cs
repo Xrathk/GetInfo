@@ -22,7 +22,7 @@ namespace DataAccessLayer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUser", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +44,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("AppUsers");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUserRequests", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUserRequests", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,7 +68,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("AppUserRequestsOverview");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUserSession", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUserSession", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,7 +95,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("AppUserSessions");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.UserDetails", b =>
+            modelBuilder.Entity("DomainLayer.Entities.UserDetails", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,7 +129,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("UserDetails");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.WeatherRequest", b =>
+            modelBuilder.Entity("DomainLayer.Entities.WeatherRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -160,9 +160,9 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("WeatherRequests");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUserRequests", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUserRequests", b =>
                 {
-                    b.HasOne("DataAccessLayer.Models.Entities.AppUser", "AppUser")
+                    b.HasOne("DomainLayer.Entities.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -171,9 +171,9 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUserSession", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUserSession", b =>
                 {
-                    b.HasOne("DataAccessLayer.Models.Entities.AppUser", "AppUser")
+                    b.HasOne("DomainLayer.Entities.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -182,18 +182,18 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.UserDetails", b =>
+            modelBuilder.Entity("DomainLayer.Entities.UserDetails", b =>
                 {
-                    b.HasOne("DataAccessLayer.Models.Entities.AppUser", "AppUser")
+                    b.HasOne("DomainLayer.Entities.AppUser", "AppUser")
                         .WithOne("UserDetails")
-                        .HasForeignKey("DataAccessLayer.Models.Entities.UserDetails", "AppUserId")
+                        .HasForeignKey("DomainLayer.Entities.UserDetails", "AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Models.Entities.AppUser", b =>
+            modelBuilder.Entity("DomainLayer.Entities.AppUser", b =>
                 {
                     b.Navigation("UserDetails");
                 });

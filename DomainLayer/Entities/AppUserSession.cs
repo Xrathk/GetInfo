@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer.Models.Entities
+﻿namespace DomainLayer.Entities
 {
     /// <summary>
     /// GetInfo app user session data. Includes sessionId for verification purposes and other session metadata.

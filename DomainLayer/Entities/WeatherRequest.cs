@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccessLayer.Models.Entities
+namespace DomainLayer.Entities
 {
     /// <summary>
     /// Weather requests per location. Used for data analytics.
