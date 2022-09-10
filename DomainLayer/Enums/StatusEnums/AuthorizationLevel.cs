@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer.Models.StatusEnums
+﻿namespace DomainLayer.Enums.StatusEnums
 {
     /// <summary>
     /// Authorization-level enum for all user levels.

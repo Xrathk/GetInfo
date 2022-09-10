@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DataAccessLayer.Models.Entities;
+using DomainLayer.Entities;
 using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer.Data

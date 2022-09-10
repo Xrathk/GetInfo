@@ -1,4 +1,4 @@
-﻿using DataAccessLayer.Models.Entities;
+﻿using DomainLayer.Entities;
 
 namespace DataAccessLayer.Contacts
 {

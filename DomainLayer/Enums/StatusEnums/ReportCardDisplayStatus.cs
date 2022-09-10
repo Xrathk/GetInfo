@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer.Models.StatusEnums
+﻿namespace DomainLayer.Enums.StatusEnums
 {
     /// <summary>
     /// Weather report display status.

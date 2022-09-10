@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer.Models.StatusEnums
+﻿namespace DomainLayer.Enums
 {
     /// <summary>
     /// Weather report types for frontend.

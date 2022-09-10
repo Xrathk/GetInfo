@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccessLayer.Models.Entities
+namespace DomainLayer.Entities
 {
     /// <summary>
     /// Individual user account details.
