@@ -15,6 +15,12 @@ namespace DomainLayer.Entities
         [Display(Name = "Last Weather Request")]
         public DateTime LastWeatherRequest { get; set; } // Last recorded weather request
 
+        [Display(Name = "Total News Requests")]
+        public int NewsRequests { get; set; } // News API requests
+
+        [Display(Name = "Last News Request")]
+        public DateTime LastNewsRequest { get; set; } // Last recorded news request
+
         // work in progress
 
 

@@ -42,6 +42,7 @@ namespace DataAccessLayer.Data
         public DbSet<UserDetails> UserDetails { get; set; }
         public DbSet<AppUserRequests> AppUserRequestsOverview { get; set; }
         public DbSet<WeatherRequest> WeatherRequests { get; set; }
+        public DbSet<NewsRequest> NewsRequests { get; set; }
 
 
         /// <summary>
@@ -64,6 +65,9 @@ namespace DataAccessLayer.Data
                 .HasKey(p => p.Id);
 
             modelBuilder.Entity<WeatherRequest>()
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<NewsRequest>()
                 .HasKey(p => p.Id);
 
             /*

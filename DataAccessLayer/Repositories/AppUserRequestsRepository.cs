@@ -129,7 +129,7 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("Updated user requests object for user with ID \"\".", appuserrequests.AppUserId);
+                        _logger.LogInformation("Updated user requests object for user with ID \"{objId}\".", appuserrequests.AppUserId);
                     }
                 }
             }
