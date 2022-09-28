@@ -1,0 +1,39 @@
+﻿.card {
+    width: 18rem;
+    margin:auto;
+    background-color: ghostwhite;
+    border-radius: 10px;
+    display:inline-block;
+    margin-right:1rem;
+    margin-left:1rem;
+}
+
+img {
+    width: contain;
+    height: 15rem;
+}
+
+#newsSection{
+    margin:auto;
+    padding-bottom:4rem;
+}
+
+#learnMoreButton{
+    position:absolute;
+    bottom:1rem;
+    width:16rem;
+}
+
+#textbox {
+    height: 13.5rem;
+    overflow: hidden;
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+#titlebox {
+    height: 8rem;
+    overflow: hidden;
+    text-align: justify;
+    text-justify: inter-word;
+}

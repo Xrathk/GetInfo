@@ -87,7 +87,7 @@ namespace LogicLayer.Services
                         }
                         catch (Exception Ex)
                         {
-                            Logger.LogError("Could not store weather request data for location -- Location: {locationName}, Exception: {currentTemp}", locationName, Ex);
+                            Logger.LogError("Could not store weather request data for location -- Location: {locationName}, Exception: {Exception}", locationName, Ex);
                         }
                         try
                         {
@@ -95,7 +95,7 @@ namespace LogicLayer.Services
                         }
                         catch (Exception Ex)
                         {
-                            Logger.LogError("Could not store weather request data for user -- UserId: {appUserId}, Exception: {currentTemp}", appUserId, Ex);
+                            Logger.LogError("Could not store weather request data for user -- UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
                         }
 
                         // Return valid response object

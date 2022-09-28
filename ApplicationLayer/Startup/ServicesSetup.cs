@@ -39,6 +39,7 @@ namespace ApplicationLayer.Startup
             services.AddScoped<IRepositoryUserDetails, RepositoryUserDetails>();
             services.AddScoped<IRepositoryAppUserRequests, RepositoryAppUserRequests>();
             services.AddScoped<IRepositoryWeatherRequest, RepositoryWeatherRequest>();
+            services.AddScoped<IRepositoryNewsRequest, RepositoryNewsRequest>();
 
             // Return new service container
             return services;
@@ -54,6 +55,7 @@ namespace ApplicationLayer.Startup
             services.AddSingleton<ErrorCodes>(); // Add error codes
             services.AddTransient<AccountOperations>(); // Add account operations service
             services.AddTransient<WeatherApiOperations>(); // Add weather API operations service
+            services.AddTransient<NewsApiOperations>(); // Add news API operations service
 
             // Return new service container
             return services;
