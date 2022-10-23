@@ -9,6 +9,8 @@ namespace DomainLayer.Entities
     {
         public int Id; // DB Id
 
+        [Required]
+        [MaxLength(128)]
         [Display(Name = "Location")]
         public string LocationName { get; set; } // Location
 

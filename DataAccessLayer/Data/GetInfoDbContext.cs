@@ -70,16 +70,7 @@ namespace DataAccessLayer.Data
             modelBuilder.Entity<NewsRequest>()
                 .HasKey(p => p.Id);
 
-            /*
-            // Nav properties
-            modelBuilder.Entity<AppUser>()
-                .HasOne(a => a.UserDetails)
-                .WithOne(b => b.AppUser);
 
-            modelBuilder.Entity<AppUser>()
-                .HasOne(a => a.UserSession)
-                .WithOne(b => b.AppUser);
-            */
         }
 
     }
