@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainLayer.Entities
 {
@@ -9,17 +10,25 @@ namespace DomainLayer.Entities
     {
         public int Id { get; set; } // DB Id
 
+        [Required]
         [MinLength(3)]
+        [MaxLength(32)]
         public string UserName { get; set; } // Username
 
+        [Required]
         [MinLength(6)]
-        public string Password { get; set; } // Password
+        [MaxLength(256)]
+        public string Password { get; set; } // Password (salted and hashed)
 
+        [Required]
+        [MaxLength(128)]
+        [Column(TypeName = "varchar(128)")]
         public string EMail { get; set; } // E-mail
 
-        // Relationships to other tables
-        //public AppUserSession UserSession { get; set; } // Session info
-        public UserDetails UserDetails { get; set; } // User details
+        // Navigation properties
+        public AppUserSession AppUserSession { get; set; }
+        public AppUserRequests AppUserRequests { get; set; }
+        public UserDetails UserDetails { get; set; }
 
     }
 }

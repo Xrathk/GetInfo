@@ -21,12 +21,12 @@ namespace DomainLayer.Entities
         [Display(Name = "Last News Request")]
         public DateTime LastNewsRequest { get; set; } // Last recorded news request
 
-        // work in progress
+        // -- WORK IN PROGRESS --
 
 
+        // Foreign Keys - Nav properties
+        [Required]
         public int AppUserId { get; set; } // UserID-ForeignKey
-
-        // Relationships to other tables
         public AppUser AppUser { get; set; } // User 
     }
 }

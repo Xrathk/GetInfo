@@ -9,6 +9,7 @@ namespace DomainLayer.Entities
     {
         public int Id; // DB Id
 
+        [Required]
         [Display(Name = "Keyword")]
         public string Keyword { get; set; } // Keyword
 
