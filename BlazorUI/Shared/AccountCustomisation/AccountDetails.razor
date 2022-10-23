@@ -1,0 +1,202 @@
+﻿@using ApplicationLayer.Data.Forms
+
+<div style="float:none;margin:0 auto;text-align: center;">
+    <h4><b>Account Details</b></h4>
+    <hr style="height: 2px;-webkit-filter: blur(2px);"/>
+</div>
+
+<!-- Details overview, form in one-->
+<EditForm Model="@detailsForm" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Form -->
+    <div class="form-row">
+        <!-- Last name -->
+        <div class="col-md-4 mb-3" style="float:right">
+            <label class="form-label" for="typeLastname" style="font-weight:bold">Last Name</label>
+            @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+            {
+                <p>@detailsForm.LastName</p>
+            }
+            else
+            {
+                <input type="text" id="typeLastname" class="form-control" @bind-value="detailsForm.LastName" />
+            }
+        </div>
+
+        <!-- First name -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label" for="typeFirstname" style="font-weight:bold">First Name</label>
+            @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+            {
+                <p>@detailsForm.FirstName</p>
+            }
+            else
+            {
+                <input type="text" id="typeFirstname" class="form-control" @bind-value="detailsForm.FirstName"/>
+            }
+        </div>
+    </div>
+
+    <br />
+    <div class="form-row">
+        <!-- Home country -->
+        <div class="col-md-4 mb-3" style="float:right">
+            <label class="form-label" for="typeNumber" style="font-weight:bold">Home Country</label>
+            @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+            {
+                <p>@detailsForm.CountryOfOrigin</p>
+            }
+            else
+            {
+                <br />
+                <select class="form-control selectpicker countrypicker" data-live-search="true" data-default="@detailsForm.CountryOfOrigin" @bind="@detailsForm.CountryOfOrigin" data-flag="false">
+                    <option>--select--</option>
+                </select>
+            }
+        </div>
+
+        <!-- Current location -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label" for="typeNumber" style="font-weight:bold">Current Location</label>
+            @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+            {
+                <p>@detailsForm.CurrentLocation</p>
+            }
+            else
+            {
+                <input type="text" id="typeText" class="form-control" @bind-value="detailsForm.CurrentLocation" />  
+            }
+        </div>
+    </div>
+     
+    <br />
+    <div class="form-row">
+        <!-- Age -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label" for="typeNumber" style="font-weight:bold">Age</label>
+            @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+            {
+                <p>@detailsForm.Age</p>
+            }
+            else
+            {
+                <input type="number" id="typeNumber" class="form-control" @bind-value="detailsForm.Age" />    
+            }
+        </div>
+    </div>
+
+    <br />
+    <div  class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style="float:right">
+        @if (formAvailabilty == FormAvailabilityStatus.NotEditable)
+        {
+            <button type="button" class="btn btn-info fw-bold" style="color:floralwhite" @onclick="@(() => {formAvailabilty = FormAvailabilityStatus.Editable; formStatus = FormSubmissionStatus.NotSent;})">Update account details</button>
+        }
+        @if (formAvailabilty == FormAvailabilityStatus.Editable)
+            {
+        <button type="button" class="btn btn-info fw-bold" style="color:floralwhite" @onclick="@(() => {formAvailabilty = FormAvailabilityStatus.NotEditable; formStatus = FormSubmissionStatus.NotSent;})">Cancel account updates</button>
+            <button class="btn btn-success fw-bold" style="margin-left:2rem" type="submit">Submit changes</button>
+        }
+    </div>
+
+</EditForm>
+
+@if (formStatus == FormSubmissionStatus.CurrentlyProcessed)
+{
+    <br />
+    <br />
+    <div class="w-100 d-flex align-items-center justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+}
+else if (formStatus == FormSubmissionStatus.Rejected) // No rejection possible so far
+{
+    <br />
+    <br />
+    <div class="alert alert-danger text-center fw-bold" role="alert" style="">
+        @submissionMessage
+    </div>
+}
+else if (formStatus == FormSubmissionStatus.Accepted)
+{
+    <br />
+    <br />
+    <div class="alert alert-success text-center fw-bold" role="alert" style="">
+        @submissionMessage
+    </div>
+}
+
+@code {
+    // Parameter - user ID
+    [Parameter]
+    public int AppUserId { get; set; }
+
+    private FormSubmissionStatus formStatus = FormSubmissionStatus.NotSent;
+    private FormAvailabilityStatus formAvailabilty = FormAvailabilityStatus.NotEditable;
+    private string submissionMessage = "";
+
+    private EditDetailsForm detailsForm = new EditDetailsForm();
+
+    private string selectedCountry = "";
+
+    void OnSelect (ChangeEventArgs e)
+    {
+        selectedCountry = e.Value.ToString();
+    }
+
+
+    // Handling valid detail update info
+    private async Task HandleValidSubmit()
+    {
+        formStatus = FormSubmissionStatus.CurrentlyProcessed;
+        // Process the valid form
+        await jsRuntime.InvokeAsync<string>("console.log", "Valid detail edit form data sent");
+
+        // Store details to database
+        bool success = await AccountOperations.StoreUserDetails(detailsForm, AppUserId);
+        if (success)
+        {
+            submissionMessage = "Account details stored successfully!";
+            formStatus = FormSubmissionStatus.Accepted;
+            formAvailabilty = FormAvailabilityStatus.NotEditable;
+        }
+        else
+        {
+            submissionMessage = "Failed to store new account details.";
+            formStatus = FormSubmissionStatus.Rejected;
+        }
+    }
+
+    // Handling invalid details update info
+    private async Task HandleInvalidSubmit()
+    {
+        // Process the invalid form
+        await jsRuntime.InvokeAsync<string>("console.log", "Invalid form data sent");
+
+    }
+
+    // Render countrypicker
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await jsRuntime.InvokeVoidAsync("AddCountrypicker");
+    }
+
+    // Load info about user
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch user details
+        var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
+        var currentDetails = await AccountOperations.RetrieveUserDetails(AppUserId);
+        // Load current details to user form
+        detailsForm.FirstName = currentDetails.FirstName;
+        detailsForm.LastName = currentDetails.LastName;
+        detailsForm.Age = currentDetails.Age;
+        detailsForm.CountryOfOrigin = currentDetails.CountryOfOrigin;
+        detailsForm.CurrentLocation = currentDetails.CurrentLocation;
+
+    }
+}
+ 

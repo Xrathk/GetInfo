@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace DataAccessLayer
 {
     /// <summary>
-    /// Methods that get executed only once, depending on app needs.
+    /// Methods that get executed only once, depending on app needs (DEVELOPMENT ONLY).
     /// </summary>
     public class OneTimeMethods
     {

@@ -1,0 +1,141 @@
+﻿@page "/myaccount"
+
+<!-- Await for authorization -->
+@if (AuthLevel == AuthorizationLevel.NotAuthorized)
+{
+    <BallLoader />
+} 
+else
+{
+    <!-- Account settings -->
+    <div class="shadow card bg-light mb-3 mt-4" style="margin:0 auto;float:none;width:70vw">
+        <div class="card-body">
+            <div class="container">
+                <div class="row">
+                    <!-- Navbar component -->
+                    <div class="col-2"  style="border-right-style:ridge">
+                        <table class="table table-hover">
+                          <tbody>
+                            <tr>
+                              <th scope="row">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.Overview">Account Overview</a>
+                                </div>
+                              </th>
+                            </tr>
+                            <tr>
+                              <th scope="row">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.Details">Edit Details</a>
+                                </div>
+                              </th>
+                            </tr>
+                            <tr>
+                              <th scope="row">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.ChangePass">Change Password</a>
+                                </div>
+                              </th>
+                            </tr>
+                            <tr>
+                              <th scope="row">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.Preferences">Preferences</a>
+                                </div>
+                              </th>
+                            </tr>
+                            <tr>
+                              <th scope="row">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.History">History</a>
+                                </div>
+                              </th>
+                            </tr>
+                            <tr>
+                              <th scope="row" style="border-bottom-style:none">
+                                  <div class="navbar-nav" role="button" style="float:none;margin:0 auto;text-align: center;">
+                                  <a class="nav-item nav-link hover" style="color:black;" @onclick="() => CurrentMenu = MenuChoice.Help">Help</a>
+                                </div>
+                              </th>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Content component based on menu choice -->
+                    <div class="col-10">
+                        @if (CurrentMenu == MenuChoice.Overview)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountOverview />
+                        }
+                        @if (CurrentMenu == MenuChoice.Details)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountDetails AppUserId="AppUserId"/>
+                        }
+                        @if (CurrentMenu == MenuChoice.ChangePass)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountChangePass />
+                        }
+                        @if (CurrentMenu == MenuChoice.Preferences)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountPreferences />
+                        }
+                        @if (CurrentMenu == MenuChoice.History)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountHistory />
+                        }
+                        @if (CurrentMenu == MenuChoice.Help)
+                        {
+                            <BlazorUI.Shared.AccountCustomisation.AccountHelp />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+}
+
+
+
+
+@code {
+    // Variables for displaying current menu
+    private MenuChoice CurrentMenu = MenuChoice.Overview;
+    private enum MenuChoice
+    {
+        Overview,
+        Details,
+        ChangePass,
+        Preferences,
+        History,
+        Help
+    }
+
+    private AuthorizationLevel AuthLevel = AuthorizationLevel.NotAuthorized; // Authorization status
+    private int AppUserId = 0; // User ID by cookie
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initial cookie check
+        var cookieValidity = await AccountOperations.VerifyAuthenticationCookie(ProtectedSessionStore);
+        if (cookieValidity == 0) // Cookie valid
+        {
+            // Authorize user and find his ID
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            AuthLevel = AuthorizationLevel.User;
+            var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
+            AppUserId = await AccountOperations.FetchUserBySessionId(userCookie);
+        }
+        else // Cookie invalid
+        {
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            UriHelper.NavigateTo("/login");
+        }
+        StateHasChanged(); // Update component
+
+        // Continue
+
+
+    }
+
+}

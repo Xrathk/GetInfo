@@ -1,0 +1,103 @@
+﻿@page "/login"
+@layout DefaultLayout
+@using ApplicationLayer.Data.Forms
+
+<!-- Main/Login page (not connected users) -->
+
+<PageTitle>GetInfo Login</PageTitle>
+
+<!-- Generic login page (sign in with credentials, or register) -->
+<div class="mb-md-1 mt-md-1 pb-2">
+
+    <h4 class="fw-bold mb-2">Welcome to GetInfo!</h4>
+    <p class="text-white-50 mb-2">Please enter your username and password!</p>
+
+
+    <EditForm Model="@logForm" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-outline form-white mb-4">
+        <label class="form-label" for="typeUsername" style="font-weight:bold">Username</label>
+        <input type="text" id="typeUsername" class="form-control form-control-lg" @bind-value="logForm.Username"/>
+        </div>
+
+        <div class="form-outline form-white mb-4">
+        <label class="form-label" for="typePasswordX" style="font-weight:bold">Password</label>
+        <input type="password" id="typePasswordX" class="form-control form-control-lg" @bind-value="logForm.Password" />
+        </div>
+        <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+    </EditForm>
+
+    @if (formStatus == FormSubmissionStatus.CurrentlyProcessed)
+    {
+        <SpinnerLoader />
+    }
+    else if (formStatus == FormSubmissionStatus.Rejected)
+    {
+        <br />
+        <div class="alert alert-danger fw-bold" role="alert" style="">
+            @submissionMessage
+        </div>
+    }
+
+</div>
+<div>
+    <p class="mb-0">Don't have an account? <a href="register" class="text-white-50 fw-bold" >Sign Up</a>
+    </p>
+</div>
+
+
+
+@code {
+    private FormSubmissionStatus formStatus = FormSubmissionStatus.NotSent;
+    private string submissionMessage = "";
+
+    private LoginForm logForm = new LoginForm();
+
+    // Handling valid registration info
+    private async Task HandleValidSubmit()
+    {
+        formStatus = FormSubmissionStatus.CurrentlyProcessed;
+        // Process the valid form
+        await jsRuntime.InvokeAsync<string>("console.log", "Valid login data sent");
+        var code = AccountOperations.LoginAccount(logForm);
+        await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(code));
+        // If credentials were correct, store cookie and login to app
+        if (code == 0)
+        {
+            var cookieState = AccountOperations.InitializeNewSession(logForm.Username);
+            if (cookieState == 0) // Retrieve cookie from server and login
+            {
+                formStatus = FormSubmissionStatus.Accepted;
+                submissionMessage = ErrorCodes.FindDescription(code) + " Logging in...";
+                await ProtectedSessionStore.SetAsync("SessionId", AccountOperations.RetrieveAuthCookie(logForm.Username));
+                await jsRuntime.InvokeAsync<string>("console.log", await ProtectedSessionStore.GetAsync<string>("SessionId"));
+                UriHelper.NavigateTo("/home");
+            }
+            else // Can't create valid cookie - user banned
+            {
+                await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(code));
+                formStatus = FormSubmissionStatus.Rejected;
+                submissionMessage = ErrorCodes.FindDescription(code);
+            }
+
+        }
+        else // Invalid credentials
+        {
+            formStatus = FormSubmissionStatus.Rejected;
+            submissionMessage = ErrorCodes.FindDescription(code);
+        }
+
+    }
+
+    // Handling invalid registration info
+    private async Task HandleInvalidSubmit()
+    {
+
+        // Process the invalid form (debug messages)
+        await jsRuntime.InvokeAsync<string>("console.log", logForm.Username); 
+        await jsRuntime.InvokeAsync<string>("console.log", logForm.Password); 
+
+    }
+}
