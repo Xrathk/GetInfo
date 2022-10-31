@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using DataAccessLayer.Contacts;
 using DomainLayer.Entities;
 using ApplicationLayer.Data.ApiObjects.WeatherAPI;
@@ -15,7 +14,6 @@ namespace ApplicationLayer.Services
     public class WeatherApiOperations : IWeatherApiOperations
     {
         // Fields
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<AccountOperations> Logger;
         private readonly IConfiguration configuration;
         // DAL repos
@@ -28,19 +26,16 @@ namespace ApplicationLayer.Services
         /// <summary>
         /// Service constuctor.
         /// </summary>
-        /// <param name="_scopeFactory">Score factory</param>
         /// <param name="logger">Logger component</param>
         /// <param name="userReqRepo">User requests model repository</param>
         /// <param name="weatherReqRepo">Weather reqests model repository</param>
         public WeatherApiOperations(
-            IServiceScopeFactory _scopeFactory,
             ILogger<AccountOperations> logger,
             IConfiguration _configuration,
             IRepositoryAppUserRequests userReqRepo,
             IRepositoryWeatherRequest weatherReqRepo
         )
         {
-            scopeFactory = _scopeFactory;
             Logger = logger;
             configuration = _configuration;
             _userReqRepo = userReqRepo;
@@ -61,68 +56,70 @@ namespace ApplicationLayer.Services
         {
             // Formulating request and getting output
             var requestId = UtilityMethods.BackendUtilityMethods.GetRandomAlphanumericString(16);
-            Logger.LogInformation("A user has requested weather data.\nRequest ID:{reqId}, User ID: {userId}, Location: {location}", requestId, appUserId, locationName);
+            Logger.LogInformation("A user has requested weather data.\n" +
+                "Request ID:{reqId}, User ID: {userId}, Location: {location}", requestId, appUserId, locationName);
 
             // Perform request
-            using (var httpClient = new HttpClient())
+            using var httpClient = new HttpClient();
+            using var request = new HttpRequestMessage(new HttpMethod("GET"), "http://api.weatherapi.com/v1/current.json?key=" + WeatherAPIKey + "&q=" + locationName + "&aqi=no");
+            var response = await httpClient.SendAsync(request);
+
+            // Get status
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                using (var request = new HttpRequestMessage(new HttpMethod("GET"), "http://api.weatherapi.com/v1/current.json?key=" + WeatherAPIKey + "&q=" + locationName + "&aqi=no"))
+                // Successful request - log output and store
+                ValidResponseObject weatherData = new();
+                weatherData = JsonConvert.DeserializeObject<ValidResponseObject>(response.Content.ReadAsStringAsync().Result); // Deserialize
+                var currentTemp = weatherData.current.temp_c; // Current temperature
+                var currentWeather = weatherData.current.condition.text; // Current weather
+                DateTime currentTime = DateTime.Now; // Current timestamp
+                Logger.LogInformation("Request with ID \"{requestID}\" has returned the status code \"{statusCode}\".\n" +
+                    "Location: {location}, Weather: {currentWeather}, Temperature: {currentTemp}", 
+                    requestId, response.StatusCode, locationName, currentWeather, currentTemp); // Logging 
+
+                // Update weather and user requests table
+                try
                 {
-                    var response = await httpClient.SendAsync(request);
-
-                    // Get status
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        // Successful request - log output and store
-                        ValidResponseObject weatherData = new ValidResponseObject();
-                        weatherData = JsonConvert.DeserializeObject<ValidResponseObject>(response.Content.ReadAsStringAsync().Result); // Deserialize
-                        var currentTemp = weatherData.current.temp_c; // Current temperature
-                        var currentWeather = weatherData.current.condition.text; // Current weather
-                        DateTime currentTime = DateTime.Now; // Current timestamp
-                        Logger.LogInformation("Request with ID \"{requestID}\" has returned the status code \"{statusCode}\".\nLocation: {location}, Weather: {currentWeather}, Temperature: {currentTemp}", requestId, response.StatusCode, locationName, currentWeather, currentTemp); // Logging 
-
-                        // Update weather and user requests table
-                        try
-                        {
-                            await UpdateWeatherRequestTable(locationName, currentTemp, currentTime);
-                        }
-                        catch (Exception Ex)
-                        {
-                            Logger.LogError("Could not store weather request data for location -- Location: {locationName}, Exception: {Exception}", locationName, Ex);
-                        }
-                        try
-                        {
-                            await UpdateUserRequests(appUserId, currentTime);
-                        }
-                        catch (Exception Ex)
-                        {
-                            Logger.LogError("Could not store weather request data for user -- UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
-                        }
-
-                        // Return valid response object
-                        return new WeatherResponseObject
-                        {
-                            responseStatus = System.Net.HttpStatusCode.OK,
-                            data = weatherData.current
-                        };
-                    }
-                    else // If request unsuccessful, print appropriate error message.
-                    {
-                        InvalidResponseObject apiResponse = new InvalidResponseObject();
-                        apiResponse = JsonConvert.DeserializeObject<InvalidResponseObject>(response.Content.ReadAsStringAsync().Result); // Deserialize error message
-                        var errorCode = apiResponse.error.code;
-                        var errorMessage = apiResponse.error.message;
-                        var statusCode = response.StatusCode;
-                        Logger.LogInformation("Could not fetch data about location -- {locationName} ==== Error code {errorCode} -- {errorMessage} (HTTP response status code -- {statusCode})", locationName, errorCode, errorMessage, statusCode); // Logging 
-
-                        // Return error response object
-                        return new WeatherResponseObject
-                        {
-                            responseStatus = response.StatusCode
-                        };
-                    }
-
+                    await UpdateWeatherRequestTable(locationName, currentTemp, currentTime);
                 }
+                catch (Exception Ex)
+                {
+                    Logger.LogError("Could not store weather request data for location.\n" +
+                        "Location: {locationName}, Exception: {Exception}", locationName, Ex);
+                }
+                try
+                {
+                    await UpdateUserRequests(appUserId, currentTime);
+                }
+                catch (Exception Ex)
+                {
+                    Logger.LogError("Could not store weather request data for user.\n" +
+                        "User ID: {appUserId}, Exception: {Exception}", appUserId, Ex);
+                }
+
+                // Return valid response object
+                return new WeatherResponseObject
+                {
+                    responseStatus = System.Net.HttpStatusCode.OK,
+                    data = weatherData.current
+                };
+            }
+            else // If request unsuccessful, print appropriate error message.
+            {
+                InvalidResponseObject apiResponse = new();
+                apiResponse = JsonConvert.DeserializeObject<InvalidResponseObject>(response.Content.ReadAsStringAsync().Result); // Deserialize error message
+                var errorCode = apiResponse.error.code;
+                var errorMessage = apiResponse.error.message;
+                var statusCode = response.StatusCode;
+                Logger.LogError("Could not fetch weather data about location.\n" +
+                    "Location: {locationName}, Error Code {errorCode}, Error Message: {errorMessage}, HTTP Response Status Code: {statusCode}", 
+                    locationName, errorCode, errorMessage, statusCode); // Logging 
+
+                // Return error response object
+                return new WeatherResponseObject
+                {
+                    responseStatus = response.StatusCode
+                };
             }
 
         }
@@ -151,17 +148,21 @@ namespace ApplicationLayer.Services
                 if (temperature < currentLocationData.MinRecordedTemperature)
                 {
                     currentLocationData.MinRecordedTemperature = temperature;
-                    Logger.LogInformation("New maximum temperature recorded for \"{location}\"! Temperature: {temp}", currentLocationData.LocationName, temperature);
+                    Logger.LogInformation("New maximum temperature recorded for location!\n" +
+                        "Location: {location}, Temperature: {temp}", currentLocationData.LocationName, temperature);
                 }
                 if (temperature > currentLocationData.MaxRecordedTemperature)
                 {
                     currentLocationData.MaxRecordedTemperature = temperature;
-                    Logger.LogInformation("New minimum temperature recorded for \"{location}\"! Temperature: {temp}", currentLocationData.LocationName, temperature);
+                    Logger.LogInformation("New minimum temperature recorded for location!\n" +
+                        "Location: {location}, Temperature: {temp}", currentLocationData.LocationName, temperature);
                 }
 
                 // Update via repo
                 _weatherReqRepo.Update(currentLocationData);
-                Logger.LogInformation("Weather request data for \"{location}\" updated. Times location requested: {timesRequested}", currentLocationData.LocationName, currentLocationData.TimesRequested);
+                Logger.LogInformation("Weather request data for location updated.\n" +
+                    "Location: {location}, Times location requested: {timesRequested}", 
+                    currentLocationData.LocationName, currentLocationData.TimesRequested);
 
             }
             else // If no, create new object
@@ -178,7 +179,9 @@ namespace ApplicationLayer.Services
 
                 // Create via repo
                 await _weatherReqRepo.Create(newLocationData);
-                Logger.LogInformation("Weather request data for \"{location}\" created. First request recorded at: {timestamp}", newLocationData.LocationName, newLocationData.LastRequested);
+                Logger.LogInformation("Weather request data for location created.\n" +
+                    "Location: {location}, First request recorded at: {timestamp}", 
+                    newLocationData.LocationName, newLocationData.LastRequested);
 
             }
 
@@ -189,7 +192,6 @@ namespace ApplicationLayer.Services
         /// </summary>
         /// <param name="appUserId">The app user ID</param>
         /// <param name="currentTimestamp">The timestamp of the last weather request</param>
-        /// <returns></returns>
         public async Task UpdateUserRequests(int appUserId, DateTime currentTimestamp)
         {
             // Fetch requests
@@ -206,7 +208,9 @@ namespace ApplicationLayer.Services
 
                 // Update via repo
                 _userReqRepo.Update(currentUserData);
-                Logger.LogInformation("User request data for user with ID \"{userId}\" updated. Total weather requests: {totalRequests}", currentUserData.AppUserId, currentUserData.WeatherRequests);
+                Logger.LogInformation("User request data for user updated.\n" +
+                    "User ID: {userId}, Total weather requests: {totalRequests}", 
+                    currentUserData.AppUserId, currentUserData.WeatherRequests);
 
             }
             else // If no, create new object
@@ -220,7 +224,9 @@ namespace ApplicationLayer.Services
 
                 // Create via repo
                 await _userReqRepo.Create(newUserData);
-                Logger.LogInformation("User request data for user with ID \"{userId}\" created. First weather request recorded at: {timestamp}", newUserData.AppUserId, newUserData.LastWeatherRequest);
+                Logger.LogInformation("User request data for user created.\n" +
+                    "User ID: {userId}, First weather request recorded at: {timestamp}", 
+                    newUserData.AppUserId, newUserData.LastWeatherRequest);
 
             }
 
@@ -235,12 +241,12 @@ namespace ApplicationLayer.Services
         public string GetWeatherIconPath(string originalPath)
         {
             // Remove first two slashes from string
-            string usefulPath = originalPath.Substring(2, originalPath.Length - 2);
+            string usefulPath = originalPath[2..];
             // Separate string, keep only 2 last elements (only last 2 elements useful)
             var substrings = usefulPath.Split('/');
 
             // Create and return new path for GetInfo app
-            string newPath = "/Pictures/WeatherPics/BaseIcons/" + substrings[substrings.Length - 2] + "/" + substrings[substrings.Length - 1];
+            string newPath = "/Pictures/WeatherPics/BaseIcons/" + substrings[^2] + "/" + substrings[^1];
             return newPath;
         }
 

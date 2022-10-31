@@ -10,7 +10,7 @@ namespace DataAccessLayer.Data
     public class GetInfoDbContext : DbContext
     {
 
-        public static string connectionString; // DB connection string
+        private readonly string connectionString; // DB connection string
 
         /// <summary>
         /// GetInfo database context constructor.
@@ -19,10 +19,6 @@ namespace DataAccessLayer.Data
         public GetInfoDbContext(IConfiguration config)
         {
             connectionString = config.GetValue<string>("DbConnectionString");
-
-            // RUN ONLY ONCE - under here, put functions that must run only once for some operation in the database
-            // For test environment (not applied in production environment)
-
         }
 
 

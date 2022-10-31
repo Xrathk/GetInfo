@@ -12,7 +12,6 @@ namespace DataAccessLayer
 
         // Fields
         private readonly GetInfoDbContext dbContext; // Db context
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<OneTimeMethods> Logger;
 
         /// <summary>
@@ -22,7 +21,6 @@ namespace DataAccessLayer
         /// <param name="logger">Logger component</param>
         public OneTimeMethods(IServiceScopeFactory _scopeFactory, ILogger<OneTimeMethods> logger)
         {
-            scopeFactory = _scopeFactory;
             dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<GetInfoDbContext>();
             Logger = logger;
             Logger.LogInformation("GetInfo one-time database operations available.");

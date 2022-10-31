@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using DataAccessLayer.Contacts;
 using DomainLayer.Entities;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +17,6 @@ namespace ApplicationLayer.Services
     public class NewsApiOperations : INewsApiOperations
     {
         // Fields
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<AccountOperations> Logger;
         private readonly IConfiguration configuration;
         // DAL repos
@@ -31,17 +29,14 @@ namespace ApplicationLayer.Services
         /// <summary>
         /// Service constuctor.
         /// </summary>
-        /// <param name="_scopeFactory">Score factory</param>
         /// <param name="logger">Logger component</param>
         public NewsApiOperations(
-            IServiceScopeFactory _scopeFactory,
             ILogger<AccountOperations> logger,
             IConfiguration _configuration,
             IRepositoryAppUserRequests userReqRepo,
             IRepositoryNewsRequest newsReqRepo
         )
         {
-            scopeFactory = _scopeFactory;
             Logger = logger;
             configuration = _configuration;
             _userReqRepo = userReqRepo;
@@ -63,92 +58,94 @@ namespace ApplicationLayer.Services
         {
             // Formulating request and getting output
             var requestId = UtilityMethods.BackendUtilityMethods.GetRandomAlphanumericString(16);
-            Logger.LogInformation("A user has requested news data.\nRequest ID:{reqId}, User ID: {userId}, Keyword: {keyword}", requestId, appUserId, keyword);
+            Logger.LogInformation("A user has requested news data.\n" +
+                "Request ID:{reqId}, User ID: {userId}, Keyword: {keyword}", requestId, appUserId, keyword);
 
             // Perform request
             var articlesResult = new ArticlesResult(); // Return object from API request
 
-            using (var httpClient = new HttpClient())
+            using var httpClient = new HttpClient();
+            using var request = new HttpRequestMessage(new HttpMethod("GET"), "http://newsapi.org/v2/everything?q=" + keyword + "&language=en" + "&apiKey=" + NewsAPIKey);
+            httpClient.DefaultRequestHeaders.Add("user-agent", "News-API-csharp/0.1");
+            httpClient.DefaultRequestHeaders.Add("x-api-key", NewsAPIKey);
+            var response = await httpClient.SendAsync(request);
+
+            // Get status
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                using (var request = new HttpRequestMessage(new HttpMethod("GET"), "http://newsapi.org/v2/everything?q=" + keyword + "&language=en" + "&apiKey=" + NewsAPIKey))
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(response.Content.ReadAsStringAsync().Result); // Deserialize
+                articlesResult.Status = apiResponse.Status;
+                if (articlesResult.Status == StatusesNewsApi.Ok)
                 {
-                    httpClient.DefaultRequestHeaders.Add("user-agent", "News-API-csharp/0.1");
-                    httpClient.DefaultRequestHeaders.Add("x-api-key", NewsAPIKey);
-                    var response = await httpClient.SendAsync(request);
+                    articlesResult.TotalResults = apiResponse.TotalResults;
+                    articlesResult.Articles = apiResponse.Articles;
+                }
 
-                    // Get status
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                // Return results based on status code
+                if (articlesResult.Status == StatusesNewsApi.Ok)
+                {
+                    DateTime currentTime = DateTime.Now; // Current timestamp
+                    Logger.LogInformation("Request with ID \"{requestID}\" has returned the status code \"{statusCode}\".\n" +
+                        "Keyword: {location}, Results fetched: {currentNews}", 
+                        requestId, articlesResult.Status, keyword, articlesResult.TotalResults); // Logging 
+
+                    // Update news and user requests table
+                    try
                     {
-                        var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(response.Content.ReadAsStringAsync().Result); // Deserialize
-                        articlesResult.Status = apiResponse.Status;
-                        if (articlesResult.Status == StatusesNewsApi.Ok)
-                        {
-                            articlesResult.TotalResults = apiResponse.TotalResults;
-                            articlesResult.Articles = apiResponse.Articles;
-                        }
-
-                        // Return results based on status code
-                        if (articlesResult.Status == StatusesNewsApi.Ok)
-                        {
-                            DateTime currentTime = DateTime.Now; // Current timestamp
-                            Logger.LogInformation("Request with ID \"{requestID}\" has returned the status code \"{statusCode}\".\nKeyword: {location}, Results fetched: {currentNews}", requestId, articlesResult.Status, keyword, articlesResult.TotalResults); // Logging 
-
-                            // Update news and user requests table
-                            try
-                            {
-                                await UpdateNewsRequestTable(keyword, articlesResult.TotalResults, currentTime);
-                            }
-                            catch (Exception Ex)
-                            {
-                                Logger.LogError("Could not store news request data for keyword -- keyword: {keyword}, Exception: {Exception}", keyword, Ex);
-                            }
-                            try
-                            {
-                                await UpdateUserRequests(appUserId, currentTime);
-                            }
-                            catch (Exception Ex)
-                            {
-                                Logger.LogError("Could not store news request data for user -- UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
-                            }
-
-                        }
-                        else
-                        {
-                            ErrorCodesNewsAPI errorCode = ErrorCodesNewsAPI.UnknownError;
-                            try
-                            {
-                                errorCode = (ErrorCodesNewsAPI)apiResponse.Code;
-                            }
-                            catch (Exception Ex)
-                            {
-                                Logger.LogError("Could not store news request data for user -- UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
-                            }
-
-                            articlesResult.Error = new Error
-                            {
-                                Code = errorCode,
-                                Message = apiResponse.Message
-                            };
-                        }
-
-                        // Return response object
-                        return articlesResult;
+                        await UpdateNewsRequestTable(keyword, articlesResult.TotalResults, currentTime);
                     }
-                    else // If request unsuccessful, print appropriate error message.
+                    catch (Exception Ex)
                     {
-                        articlesResult.Status = StatusesNewsApi.Error;
-                        articlesResult.Error = new Error
-                        {
-                            Code = ErrorCodesNewsAPI.UnexpectedError,
-                            Message = "The API returned an empty response. Are you connected to the internet?"
-                        };
-
-                        Logger.LogInformation("Could not fetch news data about keyword -- {keyword} ==== Error code: {errorCode}", keyword, articlesResult.Status); // Logging 
-                        // Return error object
-                        return articlesResult;
+                        Logger.LogError("Could not store news request data.\n" +
+                            "Keyword: {keyword}, Exception: {Exception}", keyword, Ex);
+                    }
+                    try
+                    {
+                        await UpdateUserRequests(appUserId, currentTime);
+                    }
+                    catch (Exception Ex)
+                    {
+                        Logger.LogError("Could not store news request data for user.\n" +
+                            "UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
                     }
 
                 }
+                else
+                {
+                    ErrorCodesNewsAPI errorCode = ErrorCodesNewsAPI.UnknownError;
+                    try
+                    {
+                        errorCode = apiResponse.Code;
+                    }
+                    catch (Exception Ex)
+                    {
+                        Logger.LogError("Could not store news request data for user.\n" +
+                            "UserId: {appUserId}, Exception: {Exception}", appUserId, Ex);
+                    }
+
+                    articlesResult.Error = new Error
+                    {
+                        Code = errorCode,
+                        Message = apiResponse.Message
+                    };
+                }
+
+                // Return response object
+                return articlesResult;
+            }
+            else // If request unsuccessful, print appropriate error message.
+            {
+                articlesResult.Status = StatusesNewsApi.Error;
+                articlesResult.Error = new Error
+                {
+                    Code = ErrorCodesNewsAPI.UnexpectedError,
+                    Message = "The API returned an empty response. Are you connected to the internet?"
+                };
+
+                Logger.LogError("Could not fetch news data about keyword.\n" +
+                    "Keyword: {keyword}, Error Code: {errorCode}", keyword, articlesResult.Status); // Logging 
+                                                                                                                                                            // Return error object
+                return articlesResult;
             }
 
 
@@ -178,7 +175,9 @@ namespace ApplicationLayer.Services
 
                 // Update via repo
                 _newsReqRepo.Update(currentKeywordData);
-                Logger.LogInformation("News request data for \"{keyword}\" updated. Times keyword requested: {timesRequested}, New result average per request: {newAverage}", currentKeywordData.Keyword, currentKeywordData.TimesRequested, newAverage);
+                Logger.LogInformation("News request data for keyword updated.\n " +
+                    "Keyword: {keyword}, Times Keyword Requested: {timesRequested}, New Result Average per Request: {newAverage}", 
+                    currentKeywordData.Keyword, currentKeywordData.TimesRequested, newAverage);
 
             }
             else // If no, create new object
@@ -193,7 +192,8 @@ namespace ApplicationLayer.Services
 
                 // Create via repo
                 await _newsReqRepo.Create(newKeywordData);
-                Logger.LogInformation("News request data for keyword \"{keyword}\" created. First request recorded at: {timestamp}", newKeywordData.Keyword, newKeywordData.LastRequested);
+                Logger.LogInformation("News request data for keyword keyword created. " +
+                    "Keyword: {keyword}, First request recorded at: {timestamp}", newKeywordData.Keyword, newKeywordData.LastRequested);
 
             }
 
@@ -204,7 +204,6 @@ namespace ApplicationLayer.Services
         /// </summary>
         /// <param name="appUserId">The app user ID</param>
         /// <param name="currentTimestamp">The timestamp of the last news request</param>
-        /// <returns></returns>
         public async Task UpdateUserRequests(int appUserId, DateTime currentTimestamp)
         {
             // Fetch requests
@@ -221,7 +220,8 @@ namespace ApplicationLayer.Services
 
                 // Update via repo
                 _userReqRepo.Update(currentUserData);
-                Logger.LogInformation("User request data for user with ID \"{userId}\" updated. Total news requests: {totalRequests}", currentUserData.AppUserId, currentUserData.NewsRequests);
+                Logger.LogInformation("User request data for user updated.\n" +
+                    "User ID: {userId}, Total news requests: {totalRequests}", appUserId, currentUserData.NewsRequests);
 
             }
             else // If no, create new object
@@ -235,7 +235,8 @@ namespace ApplicationLayer.Services
 
                 // Create via repo
                 await _userReqRepo.Create(newUserData);
-                Logger.LogInformation("User request data for user with ID \"{userId}\" created. First news request recorded at: {timestamp}", newUserData.AppUserId, newUserData.LastNewsRequest);
+                Logger.LogInformation("User request data for user created.\n" +
+                    "User ID: {userId}, First news request recorded at: {timestamp}", appUserId, newUserData.LastNewsRequest);
 
             }
 

@@ -189,7 +189,7 @@ else if (formStatus == FormSubmissionStatus.Accepted)
     {
         // Fetch user details
         var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
-        var currentDetails = await AccountOperations.RetrieveUserDetails(AppUserId);
+        var currentDetails = AccountOperations.RetrieveUserDetails(AppUserId);
         // Load current details to user form
         detailsForm.FirstName = currentDetails.FirstName;
         detailsForm.LastName = currentDetails.LastName;

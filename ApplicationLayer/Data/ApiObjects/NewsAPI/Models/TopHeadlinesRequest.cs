@@ -14,7 +14,7 @@ namespace ApplicationLayer.Data.ApiObjects.NewsAPI.Models
         /// <summary>
         /// If you want to restrict the results to specific sources, add their Ids here. You can find source Ids with the /sources endpoint or on newsapi.org.
         /// </summary>
-        public List<string> Sources = new List<string>();
+        public List<string> Sources = new();
         /// <summary>
         /// If you want to restrict the headlines to a specific news category, add these here.
         /// </summary>

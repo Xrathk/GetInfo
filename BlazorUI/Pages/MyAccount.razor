@@ -124,7 +124,7 @@ else
             await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
             AuthLevel = AuthorizationLevel.User;
             var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
-            AppUserId = await AccountOperations.FetchUserBySessionId(userCookie);
+            AppUserId = AccountOperations.FetchUserBySessionId(userCookie);
         }
         else // Cookie invalid
         {

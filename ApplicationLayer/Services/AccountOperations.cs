@@ -1,7 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using DomainLayer.Entities;
 using ApplicationLayer.Data.Forms;
@@ -17,7 +16,6 @@ namespace ApplicationLayer.Services
     public class AccountOperations : IAccountOperations
     {
         // Fields
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<AccountOperations> Logger;
         // DAL repos
         public readonly IRepositoryAppUser _userRepo;
@@ -27,20 +25,17 @@ namespace ApplicationLayer.Services
         /// <summary>
         /// Service constuctor.
         /// </summary>
-        /// <param name="_scopeFactory">Score factory</param>
         /// <param name="logger">Logger component</param>
         /// <param name="userRepo">User model repository</param>
         /// <param name="sessionRepo">Session model repository</param>
         /// <param name="userDetailsRepo">User details model repository</param>
         public AccountOperations(
-            IServiceScopeFactory _scopeFactory,
             ILogger<AccountOperations> logger,
             IRepositoryAppUser userRepo,
             IRepositoryAppUserSession sessionRepo,
             IRepositoryUserDetails userDetailsRepo
         )
         {
-            scopeFactory = _scopeFactory;
             Logger = logger;
             _userRepo = userRepo;
             _sessionRepo = sessionRepo;
@@ -63,11 +58,11 @@ namespace ApplicationLayer.Services
             var accounts = _userRepo.GetAll();
 
             // Check if email and username already exist - return error codes if yes
-            if (accounts.Where(x => x.EMail.Equals(userForm.Email)).Count() > 0)
+            if (accounts.Where(x => x.EMail.Equals(userForm.Email)).Any())
             {
                 return 2;
             }
-            if (accounts.Where(x => x.UserName.Equals(userForm.Username)).Count() > 0)
+            if (accounts.Where(x => x.UserName.Equals(userForm.Username)).Any())
             {
                 return 1;
             }
@@ -84,7 +79,8 @@ namespace ApplicationLayer.Services
 
             // Store user to database
             var createdUser = _userRepo.Create(newUser); // Synchronously so ID can be fetched for logging
-            Logger.LogInformation("A new user has registered. Username: {userName}, Email: {eMail}, User ID: {appUserId}", newUser.UserName, newUser.EMail, createdUser.Id);
+            Logger.LogInformation("A new user has registered.\n " +
+                "Username: {userName}, Email: {eMail}, User ID: {appUserId}", newUser.UserName, newUser.EMail, createdUser.Id);
 
             return 0;
         }
@@ -109,7 +105,8 @@ namespace ApplicationLayer.Services
                 {
                     if (BCrypt.Net.BCrypt.Verify(userForm.Password, user.Password)) // Verify password hash, login if verification successful
                     {
-                        Logger.LogInformation("User with ID {appUserId} has successfully logged in.", user.Id);
+                        Logger.LogInformation("User has successfully logged in.\n" +
+                            "User ID: {userId}", user.Id);
                         return 0;
                     }
                     else // If password incorrect, return appropriate error code
@@ -119,7 +116,8 @@ namespace ApplicationLayer.Services
                 }
                 catch (Exception Ex) // Log exception and generic error message for user
                 {
-                    Logger.LogWarning("Error during login operation for user with ID {appUserId} -- Exception: {Ex}", user.Id, Ex);
+                    Logger.LogError("Error during login operation for user.\n" +
+                        "User ID: {appUserId}, Exception: {Ex}", user.Id, Ex);
                     return 6;
                 }
 
@@ -133,7 +131,6 @@ namespace ApplicationLayer.Services
 
         /// <summary>
         /// Initializes a new user session by granting user client an authentication cookie after a successful login.
-        /// Valid cookies are required to login to GetWeather.
         /// </summary>
         /// <param name="username">The client's username.</param>
         /// <returns>A return code for the status of the session initialization.</returns>
@@ -142,7 +139,7 @@ namespace ApplicationLayer.Services
         public int InitializeNewSession(string username)
         {
             // Create new authentication token for user -- SHA256 hash of username concatenated with a random number from 10 to 20 million.
-            Random rnd = new Random();
+            Random rnd = new();
             var toBeHashedString = username + rnd.Next(10000000, 20000000).ToString();
             string userCookie = "";
             using (var sha256 = SHA256.Create())
@@ -166,6 +163,9 @@ namespace ApplicationLayer.Services
                     AppUserID = appUserId
                 };
                 _sessionRepo.Create(newSession);
+                Logger.LogInformation("A new user has logged in for the first time.\n " +
+                "Username: {userName}, Session ID: {sessId}, User ID: {userId}", 
+                newSession.UserName, newSession.SessionId, newSession.AppUserID);
             }
             else // Else, update cookie
             {
@@ -192,7 +192,6 @@ namespace ApplicationLayer.Services
         /// <summary>
         /// Verifies a session Id of a user. 
         /// This check is done in all pages that aren't the login or register pages.
-        /// Valid cookies are required to login to GetWeather.
         /// </summary>
         /// <param name="ProtectedSessionStore">The client's session storage.</param>
         /// <returns>A return code for the validity of the cookie.</returns>
@@ -228,7 +227,7 @@ namespace ApplicationLayer.Services
         /// </summary>
         /// <param name="AppUserId">The user's ID</param>
         /// <returns>The user's details.</returns>
-        public async Task<UserDetails> RetrieveUserDetails(int AppUserId)
+        public UserDetails RetrieveUserDetails(int AppUserId)
         {
             // Fetch user details
             var userDetails = _userDetailsRepo.GetByUserId(AppUserId);
@@ -247,7 +246,7 @@ namespace ApplicationLayer.Services
         /// </summary>
         /// <param name="sessionId">The user's session ID</param>
         /// <returns>The user ID.</returns>
-        public async Task<int> FetchUserBySessionId(string sessionId)
+        public int FetchUserBySessionId(string sessionId)
         {
             var userSessionData = _sessionRepo.GetBySessionId(sessionId);
             if (userSessionData != null)
@@ -296,7 +295,8 @@ namespace ApplicationLayer.Services
                 _userDetailsRepo.Update(currentDetails);
             }
 
-            Logger.LogInformation("User with ID {appUserId} has modified their account details.", AppUserId); ;
+            Logger.LogInformation("User has has modified their account details.\n" +
+                "User ID: {userId}", AppUserId); 
             return true; // All information is accepted, for the moment
         }
 

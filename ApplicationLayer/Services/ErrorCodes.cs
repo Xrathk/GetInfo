@@ -35,46 +35,47 @@ namespace ApplicationLayer.Services
         /// <returns>A list of all possible errors (code-description).</returns>
         public static List<AppError> InitializeErrorList()
         {
-            List<AppError> errorList = new List<AppError>();
+            List<AppError> errorList = new()
+            {
+                // Success code
+                new AppError
+                {
+                    ErrorCode = 0,
+                    ErrorDescription = "Success!"
+                },
 
-            // Success code
-            errorList.Add(new AppError
-            {
-                ErrorCode = 0,
-                ErrorDescription = "Success!"
-            });
-
-            // Error codes
-            errorList.Add(new AppError
-            {
-                ErrorCode = 1,
-                ErrorDescription = "Error - New account cannot be created: This username already exists. Try changing your username!"
-            });
-            errorList.Add(new AppError
-            {
-                ErrorCode = 2,
-                ErrorDescription = "Error - New account cannot be created: An account is already registered for this e-mail address."
-            });
-            errorList.Add(new AppError
-            {
-                ErrorCode = 3,
-                ErrorDescription = "Error - Cannot login: Invalid credentials. Make sure your username and password are correct."
-            });
-            errorList.Add(new AppError
-            {
-                ErrorCode = 4,
-                ErrorDescription = "Error - Cannot login: Your account is banned. Contract our support department for more details."
-            });
-            errorList.Add(new AppError
-            {
-                ErrorCode = 5,
-                ErrorDescription = "Error - Cannot login: Authentication cookie is wrong or has expired."
-            });
-            errorList.Add(new AppError // Blanket error for exceptions
-            {
-                ErrorCode = 6,
-                ErrorDescription = "Error - Something went wrong. Please try again."
-            });
+                // Error codes
+                new AppError
+                {
+                    ErrorCode = 1,
+                    ErrorDescription = "Error - New account cannot be created: This username already exists. Try changing your username!"
+                },
+                new AppError
+                {
+                    ErrorCode = 2,
+                    ErrorDescription = "Error - New account cannot be created: An account is already registered for this e-mail address."
+                },
+                new AppError
+                {
+                    ErrorCode = 3,
+                    ErrorDescription = "Error - Cannot login: Invalid credentials. Make sure your username and password are correct."
+                },
+                new AppError
+                {
+                    ErrorCode = 4,
+                    ErrorDescription = "Error - Cannot login: Your account is banned. Contract our support department for more details."
+                },
+                new AppError
+                {
+                    ErrorCode = 5,
+                    ErrorDescription = "Error - Cannot login: Authentication cookie is wrong or has expired."
+                },
+                new AppError // Blanket error for exceptions
+                {
+                    ErrorCode = 6,
+                    ErrorDescription = "Error - Something went wrong. Please try again."
+                }
+            };
 
             // Return error list
             return errorList;

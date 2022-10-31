@@ -11,14 +11,14 @@
         <p>Enter the name of the location you'd like a weather report on:</p>
         <div>
             <input class="form-control form-control-lg" type="text" placeholder="Location" @bind="searchedLocation" style="width:30%;margin:auto;">
-            <button type="button" class="btn btn-light" @onclick="@(async () => {reportCardLocation = searchedLocation; reportType = WeatherReportType.NewLocation; await GetWeatherReport();})" style="margin-top:0.4rem">Search</button>
+            <button type="button" class="btn btn-light" @onclick="@(async () => {reportCardLocation = searchedLocation; await GetWeatherReport();})" style="margin-top:0.4rem">Search</button>
             <br />
             <br />
         </div>
         @if (!string.IsNullOrEmpty(currentLocation))
         {
             <p>Alternatively, you can get a weather report on your current location:</p>
-            <button type="button" class="btn btn-info btn-lg btn-block"  @onclick="@(async () => {reportCardLocation = currentLocation; reportType = WeatherReportType.CurrentLocation; await GetWeatherReport();})"  style="width:25%;color:white">Get weather report for @currentLocation</button>
+            <button type="button" class="btn btn-info btn-lg btn-block"  @onclick="@(async () => {reportCardLocation = currentLocation; await GetWeatherReport();})"  style="width:25%;color:white">Get weather report for @currentLocation</button>
         }
         else
         {
@@ -83,22 +83,16 @@ else
     private string reportCardLocation = "";
     // User data retrieved status
     private UserDataRetrievalStatus userDataRetrieved = UserDataRetrievalStatus.Loading;
-    // Type of search
-    private WeatherReportType reportType = WeatherReportType.Undefined;
     // Display report card
     private ReportCardDisplayStatus reportDisplay = ReportCardDisplayStatus.NoRequest; 
     // User submission status
     private FormSubmissionStatus submissionStatus = FormSubmissionStatus.NotSent; 
 
-
-    private bool authorized = false; // Authorization variable
-    private bool showReportCard = false; // Holds info on whether to display report card
     private int AppUserId = 0; // User ID by cookie
 
     // Weather report
     private WeatherResponseObject responseData = new WeatherResponseObject();
     private string weatherIconPath = ""; // Icon path for weather report
-    private System.Net.HttpStatusCode requestStatus;
 
     /// <summary>
     /// Retrieves a weather report based on user input or user's current location.
@@ -136,9 +130,8 @@ else
         {
             // Authorize user and find his ID
             await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
-            authorized = true;
             var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
-            AppUserId = await AccountOperations.FetchUserBySessionId(userCookie);
+            AppUserId = AccountOperations.FetchUserBySessionId(userCookie);
         }
         else // Cookie invalid
         {
@@ -148,7 +141,7 @@ else
         StateHasChanged(); // Update component
 
         // Get details for app user
-        var userDetails = await AccountOperations.RetrieveUserDetails(AppUserId);
+        var userDetails = AccountOperations.RetrieveUserDetails(AppUserId);
         currentLocation = userDetails.CurrentLocation;
         userDataRetrieved = UserDataRetrievalStatus.Retrieved;
 

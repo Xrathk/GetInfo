@@ -114,7 +114,7 @@ else
             await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
             authorized = true;
             var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
-            AppUserId = await AccountOperations.FetchUserBySessionId(userCookie);
+            AppUserId = AccountOperations.FetchUserBySessionId(userCookie);
         }
         else // Cookie invalid
         {
@@ -123,7 +123,7 @@ else
         }
         StateHasChanged(); // Update component
 
-        // Get details for app user
+        // Get details for app user (if needed later)
 
 
 

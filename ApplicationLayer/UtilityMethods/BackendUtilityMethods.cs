@@ -12,7 +12,7 @@
         /// <returns>A random alphanumeric string.</returns>
         public static string GetRandomAlphanumericString(int length)
         {
-            Random random = new Random(); // Randomness generator
+            Random random = new(); // Randomness generator
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Available characters for returned string
 
             return new string(Enumerable.Repeat(chars, length) // Create random string

@@ -18,7 +18,7 @@
 
             // Get correct filename, return to frontend
             randomFile = randomFile.Replace('\\', '/');
-            return randomFile.Substring(randomFile.IndexOf('/'));
+            return randomFile[randomFile.IndexOf('/')..];
 
         }
 
@@ -32,10 +32,9 @@
         {
             if (type == 1)
             {
-                string newText = "";
                 if (text.Length > 97)
                 {
-                    newText = text.Substring(0, 98) + "...";
+                    string newText = string.Concat(text.AsSpan(0, 98), "...");
                     return newText;
                 }
                 else
@@ -46,10 +45,9 @@
             }
             else // type = 2
             {
-                string newText = "";
                 if (text.Length > 240)
                 {
-                    newText = text.Substring(0, 241) + "...";
+                    string newText = string.Concat(text.AsSpan(0, 241), "...");
                     return newText;
                 }
                 else
