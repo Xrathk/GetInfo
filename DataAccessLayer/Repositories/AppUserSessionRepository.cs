@@ -37,7 +37,8 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add(AppUserSession);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("New session initialized.\n User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
+                    _logger.LogInformation("New session initialized.\n" +
+                        "User ID: {userId}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
                     return obj.Entity;
                 }
                 else
@@ -47,7 +48,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new session for user with ID \"{userId}\" to database. Exception: {Ex}", AppUserSession.AppUserID, Ex);
+                _logger.LogError("Could not store new session for user to database.\n" +
+                    "User ID: {userId} Exception: {Ex}", AppUserSession.AppUserID, Ex);
                 return null;
             }
         }
@@ -66,13 +68,15 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("Session info deleted.\n User ID: {}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
+                        _logger.LogInformation("Session info deleted.\n" +
+                            "User ID: {userId}, Session ID: {sessId}", obj.Entity.AppUserID, obj.Entity.SessionId);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not delete session info for user with ID \"{userId}\" to database. Exception: {Ex}", AppUserSession.AppUserID, Ex);
+                _logger.LogError("Could not delete session info for user in database.\n" +
+                    "User ID: {userId}, Exception: {Ex}", AppUserSession.AppUserID, Ex);
             }
         }
 
@@ -90,7 +94,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve sessions from database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not retrieve user sessions from database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -110,7 +115,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve info for session with ID \"{sessId}\" from database. Exception: {Ex}", Id, Ex);
+                _logger.LogError("Could not retrieve info for session from database.\n" +
+                    "Session ID: {sessId}, Exception: {Ex}", Id, Ex);
                 return null;
             }
         }
@@ -130,7 +136,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve session info for user with username \"{userName}\" from database. Exception: {Ex}", username, Ex);
+                _logger.LogError("Could not retrieve session info from database.\n" +
+                    "Username: {username}, Exception: {Ex}", username, Ex);
                 return null;
             }
         }
@@ -150,7 +157,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve session info for session ID \"{sessId}\" from database. Exception: {Ex}", sessionId, Ex);
+                _logger.LogError("Could not retrieve session info from database.\n" +
+                    "Session ID: {sessId}, Exception: {Ex}", sessionId, Ex);
                 return null;
             }
         }
@@ -169,13 +177,16 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("Session info updated.\n User ID: {userId}, Session ID: {sessId}, Session active: {sessStatus}", obj.Entity.AppUserID, obj.Entity.SessionId, obj.Entity.SessionActive);
+                        _logger.LogInformation("Session info updated.\n" +
+                            "User ID: {userId}, Session ID: {sessId}, Session active: {sessStatus}", 
+                            obj.Entity.AppUserID, obj.Entity.SessionId, obj.Entity.SessionActive);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not update session info for user with ID \"{userId}\". Exception: {Ex}", AppUserSession.AppUserID, Ex);
+                _logger.LogError("Could not update session info for user in database.\n" +
+                    "User ID:{appUserId}, Exception: {Ex}", AppUserSession.AppUserID, Ex);
             }
         }
     }

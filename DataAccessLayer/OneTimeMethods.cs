@@ -5,14 +5,13 @@ using Microsoft.Extensions.Logging;
 namespace DataAccessLayer
 {
     /// <summary>
-    /// Methods that get executed only once, depending on app needs.
+    /// Methods that get executed only once, depending on app needs (DEVELOPMENT ONLY).
     /// </summary>
     public class OneTimeMethods
     {
 
         // Fields
         private readonly GetInfoDbContext dbContext; // Db context
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<OneTimeMethods> Logger;
 
         /// <summary>
@@ -22,7 +21,6 @@ namespace DataAccessLayer
         /// <param name="logger">Logger component</param>
         public OneTimeMethods(IServiceScopeFactory _scopeFactory, ILogger<OneTimeMethods> logger)
         {
-            scopeFactory = _scopeFactory;
             dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<GetInfoDbContext>();
             Logger = logger;
             Logger.LogInformation("GetInfo one-time database operations available.");

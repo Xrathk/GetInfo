@@ -1,0 +1,131 @@
+﻿@using DomainLayer.Enums.StatusEnums
+@using ApplicationLayer.Data.ApiObjects.NewsAPI.Models;
+@using ApplicationLayer.Data.ApiObjects.NewsAPI.Constants;
+@using ApplicationLayer.UtilityMethods;
+@inject ApplicationLayer.Contracts.INewsApiOperations NewsOperations
+
+@page "/news"
+
+@if (authorized)
+{
+    <div class="text-center">
+        <h2>Be informed about everything.</h2>
+        <br />
+        <p>What would you like to get news about?</p>
+        <div>
+            <input class="form-control form-control-lg" type="text" placeholder="Key word, f.e. 'Science'" @bind="searchQuery" style="width:30%;margin:auto;">
+            <button type="button" class="btn btn-light" @onclick="@(async () => {await GetNewsReport();})" style="margin-top:0.4rem">Search</button>
+            <br />
+            <br />
+        </div>
+    </div>
+    @if (submissionStatus == FormSubmissionStatus.CurrentlyProcessed)
+    {
+        <SpinnerLoader />
+    }
+    else if (submissionStatus == FormSubmissionStatus.Accepted)
+    {
+        @if (reportDisplay == ReportCardDisplayStatus.SuccessfulRequest)
+        {
+             <div class="text-center" id = "newsSection">
+            @for (int i = 0; i < 4; i++) // fetch 4 results (example)
+            {
+                <div class="card">
+                    <img src="@newsArticles.Articles[i].UrlToImage" class="card-img-top" alt="...">
+                    <div class="card-body" style="padding:1rem; height:28rem;">
+                        <div class="text-center" id = "titlebox">
+                            <h5 class="card-title">@FrontendUtilityMethods.LimitText(1,newsArticles.Articles[i].Title)</h5>
+                        </div>
+                        <div class="text-justify" id = "textbox">
+                            <p class="card-text">@FrontendUtilityMethods.LimitText(2,newsArticles.Articles[i].Description)</p>
+                        </div>
+                        <div class="text-center" id = "learnMoreButton">
+                            <hr>
+                            <a href="@newsArticles.Articles[i].Url" target="_blank" class="btn btn-primary">Learn more</a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+            </div>
+        }
+        else if (reportDisplay == ReportCardDisplayStatus.BadRequest)
+        {
+            <div class="alert alert-warning" role="alert">
+                Error - Could not find news about "@searchQuery".
+            </div>
+        }
+    }
+}
+else
+{
+    <SpinnerLoader />
+}
+
+
+
+@code {
+    // Search query
+    private string searchQuery = "";
+
+    // User submission status
+    private FormSubmissionStatus submissionStatus = FormSubmissionStatus.NotSent; 
+    // Display report card
+    private ReportCardDisplayStatus reportDisplay = ReportCardDisplayStatus.NoRequest; 
+
+
+    private bool authorized = false; // Authorization variable
+    private int AppUserId = 0; // User ID by cookie
+
+    // News report
+    private ArticlesResult newsArticles = new ArticlesResult();
+
+    /// <summary>
+    /// Retrieves a news report based on user input.
+    /// </summary>
+    private async Task GetNewsReport()
+    {
+        submissionStatus = FormSubmissionStatus.CurrentlyProcessed;
+        // Retrieve data from service
+        newsArticles = await NewsOperations.GetNewsData(AppUserId, searchQuery);
+
+        // If request successful, display results
+        if (newsArticles.Status == StatusesNewsApi.Ok)
+        {
+            submissionStatus = FormSubmissionStatus.Accepted;
+            reportDisplay = ReportCardDisplayStatus.SuccessfulRequest;
+        }
+        else // Display error message
+        {
+            submissionStatus = FormSubmissionStatus.Accepted;
+            reportDisplay = ReportCardDisplayStatus.BadRequest;
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initial cookie check
+        var cookieValidity = await AccountOperations.VerifyAuthenticationCookie(ProtectedSessionStore);
+        if (cookieValidity == 0) // Cookie valid
+        {
+            // Authorize user and find his ID
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            authorized = true;
+            var userCookie = (await ProtectedSessionStore.GetAsync<string>("SessionId")).Value;
+            AppUserId = AccountOperations.FetchUserBySessionId(userCookie);
+        }
+        else // Cookie invalid
+        {
+            await jsRuntime.InvokeAsync<string>("console.log", ErrorCodes.FindDescription(cookieValidity));
+            UriHelper.NavigateTo("/login");
+        }
+        StateHasChanged(); // Update component
+
+        // Get details for app user (if needed later)
+
+
+
+    }
+}

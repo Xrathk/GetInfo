@@ -1,0 +1,26 @@
+﻿@*Dotnet usings*@
+@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+
+@*Project usings*@
+@using BlazorUI
+@using BlazorUI.Shared
+@using BlazorUI.Shared.Loaders
+
+@*Useful libraries and services*@
+@inject NavigationManager UriHelper
+@inject IJSRuntime jsRuntime  
+@inject ApplicationLayer.Contracts.IErrorCodes ErrorCodes
+@inject ApplicationLayer.Contracts.IAccountOperations AccountOperations
+@using DomainLayer.Enums.StatusEnums
+@using DomainLayer.Enums
+
+@*Session storage*@
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore

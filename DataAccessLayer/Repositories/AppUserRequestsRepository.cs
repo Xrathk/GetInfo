@@ -37,7 +37,8 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add(appuserrequests);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("Added new user requests object for user with ID \"{userId}\".", obj.Entity.AppUserId);
+                    _logger.LogInformation("Added new user requests object for user.\n" +
+                        "UserId: {userId}", obj.Entity.AppUserId);
                     return obj.Entity;
                 }
                 else
@@ -47,7 +48,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new user requests object to database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not store new user requests object to database.\n" +
+                    "User ID: {userId}, Exception: {Ex}",appuserrequests.AppUserId, Ex);
                 return null;
             }
         }
@@ -66,13 +68,15 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("Deleted user requests object for user with ID \"{userId}\" from database.", obj.Entity.AppUserId);
+                        _logger.LogInformation("Deleted user requests object from database.\n" +
+                            "Requests object ID: {objId}", obj.Entity.AppUserId);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not delete user requests object with ID \"{objId}\" from database. Exception: {Ex}", appuserrequests.Id, Ex);
+                _logger.LogError("Could not delete user requests object from database.\n" +
+                    "Requests object ID: {objId} Exception: {Ex}", appuserrequests.Id, Ex);
             }
         }
 
@@ -90,7 +94,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve users requests overview from database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not retrieve users requests overview from database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -110,7 +115,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve user requests object with ID \"{objId}\" from database. Exception: {Ex}", Id, Ex);
+                _logger.LogError("Could not retrieve user requests object from database.\n" +
+                    "User Requests object ID: {objId}, Exception: {Ex}", Id, Ex);
                 return null;
             }
         }
@@ -129,13 +135,15 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("Updated user requests object for user with ID \"{objId}\".", appuserrequests.AppUserId);
+                        _logger.LogInformation("Updated user requests object .\n" +
+                            "User Requests object ID: {objId}", appuserrequests.AppUserId);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not update info for user requests object with ID \"{objId}\". Exception: {Ex}", appuserrequests.Id, Ex);
+                _logger.LogError("Could not update info for user requests object in database.\n" +
+                    "User Requests object ID: {objId}, Exception: {Ex}", appuserrequests.Id, Ex);
             }
         }
     }

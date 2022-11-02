@@ -37,7 +37,8 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add(newsrequest);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("News request data object initiated successfully:\n Keyword: {keyword}, Results fetched: {results}", obj.Entity.Keyword, obj.Entity.TimesRequested);
+                    _logger.LogInformation("News request data object initiated successfully:\n" +
+                        "Keyword: {keyword}, Results fetched: {results}", obj.Entity.Keyword, obj.Entity.TimesRequested);
                     return obj.Entity;
                 }
                 else
@@ -47,7 +48,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new news request to database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not store new news request to database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -66,13 +68,15 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("News request object deleted successfully from database:\n Request ID:{id}, Keyword: {keyword}", newsrequest.Id, newsrequest.Keyword);
+                        _logger.LogInformation("News request object deleted successfully from database:\n" +
+                            "Request ID:{id}, Keyword: {keyword}", newsrequest.Id, newsrequest.Keyword);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not delete news request data with ID \"{requestId}\" from database. Exception: {Ex}", newsrequest.Id, Ex);
+                _logger.LogError("Could not delete news request data from database.\n" +
+                    "Request ID: {reqId}, Exception: {Ex}", newsrequest.Id, Ex);
             }
         }
 
@@ -90,7 +94,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve news requests from database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not retrieve news requests from database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -110,7 +115,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve news request with ID \"{objId}\" from database. Exception: {Ex}", Id, Ex);
+                _logger.LogError("Could not retrieve news request object from database.\n" +
+                    "News Request object ID: {objId}, Exception: {Ex}", Id, Ex);
                 return null;
             }
         }
@@ -129,13 +135,16 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("News request data object updated successfully:\n Keyword: {keyword}, Total requests: {totalRequests}, Average results per request: {avgResults}", obj.Entity.Keyword, obj.Entity.TimesRequested, obj.Entity.AverageResults);
+                        _logger.LogInformation("News request data object updated successfully:\n" +
+                            "Keyword: {keyword}, Total requests: {totalRequests}, Average results per request: {avgResults}", 
+                            obj.Entity.Keyword, obj.Entity.TimesRequested, obj.Entity.AverageResults);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not update news request info with ID \"{objId}\". Exception: {Ex}", newsrequest.Id, Ex);
+                _logger.LogError("Could not update news request object in database.\n" +
+                    "News Request object ID: {objId}, Exception: {Ex}", newsrequest.Id, Ex);
             }
         }
     }

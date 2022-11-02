@@ -14,9 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Tasks.txt = Tasks.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationLayer", "ApplicationLayer\ApplicationLayer.csproj", "{384C0038-E72A-45BB-B5B6-64D3708FA2E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationLayer", "LogicLayer\ApplicationLayer.csproj", "{384C0038-E72A-45BB-B5B6-64D3708FA2E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorUI", "BlazorUI\BlazorUI.csproj", "{83A0FBEF-55BF-44B9-AC66-05C0006E449A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorUI", "ApplicationLayer\BlazorUI.csproj", "{83A0FBEF-55BF-44B9-AC66-05C0006E449A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainLayer", "DomainLayer\DomainLayer.csproj", "{9B9DC00C-E444-4D4A-98A9-E772C3054AB4}"
 EndProject

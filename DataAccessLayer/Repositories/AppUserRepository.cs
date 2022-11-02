@@ -37,7 +37,9 @@ namespace DataAccessLayer.Repositories
                 {
                     var obj = dbContext.Add(appuser);
                     await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("User added to database:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
+                    _logger.LogInformation("User added to database:\n" +
+                        "User Id: {id}, Username: {userName}, Email: {eMail}", 
+                        obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     return obj.Entity;
                 }
                 else
@@ -47,7 +49,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not store new user to database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not store new user to database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -66,13 +69,16 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChangesAsync();
-                        _logger.LogInformation("User deleted from database successfully:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
+                        _logger.LogInformation("User deleted from database successfully.\n" +
+                            "User Id: {id}, Username: {userName}, Email: {eMail}", 
+                            obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not delete user with ID \"{userId}\" from database. Exception: {Ex}", appuser.Id, Ex);
+                _logger.LogError("Could not delete user from database.\n" +
+                    "User ID: {userId}, Exception: {Ex}", appuser.Id, Ex);
             }
         }
 
@@ -90,7 +96,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve users from database. Exception: {Ex}", Ex);
+                _logger.LogError("Could not retrieve users from the database.\n" +
+                    "Exception: {Ex}", Ex);
                 return null;
             }
         }
@@ -110,7 +117,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve user with ID \"{userId}\" from database. Exception: {Ex}", Id, Ex);
+                _logger.LogError("Could not retrieve user from database.\n" +
+                    "User ID: {userId}, Exception: {Ex}", Id, Ex);
                 return null;
             }
         }
@@ -130,7 +138,8 @@ namespace DataAccessLayer.Repositories
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not retrieve user with username \"{userName}\" from database. Exception: {Ex}", username, Ex);
+                _logger.LogError("Could not retrieve user from database.\n" +
+                    "Username: {username}, Exception: {Ex}", username, Ex);
                 return null;
             }
         }
@@ -149,13 +158,15 @@ namespace DataAccessLayer.Repositories
                     if (obj != null)
                     {
                         dbContext.SaveChanges();
-                        _logger.LogInformation("User info updated successfully. New properties:\nUser Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
+                        _logger.LogInformation("User info updated successfully.\n" +
+                            "User Id: {id}, Username: {userName}, Email: {eMail}", obj.Entity.Id, obj.Entity.UserName, obj.Entity.EMail);
                     }
                 }
             }
             catch (Exception Ex) // Exception handling
             {
-                _logger.LogInformation("Could not update info for user with ID \"{userId}\". Exception: {Ex}", appuser.Id, Ex);
+                _logger.LogError("Could not update info for user in the database.\n" +
+                    "User ID: {userId}, Exception: {Ex}", appuser.Id, Ex);
             }
         }
     }
