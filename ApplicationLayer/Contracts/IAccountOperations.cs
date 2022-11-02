@@ -21,7 +21,7 @@ namespace ApplicationLayer.Contracts
         /// </summary>
         /// <param name="username">The client's username.</param>
         /// <returns>A return code for the status of the session initialization.</returns>
-        int InitializeNewSession(string username);
+        Task<int> InitializeNewSession(string username);
 
         /// <summary>
         /// This method handles logon operations of users to the app.

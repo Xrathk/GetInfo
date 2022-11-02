@@ -136,7 +136,7 @@ namespace ApplicationLayer.Services
         /// <returns>A return code for the status of the session initialization.</returns>
         /// 0: SessionId stored successfully.
         /// 4: Error - Cannot initiate session - user is banned. (WILL ADD FUNCTIONALITY LATER)
-        public int InitializeNewSession(string username)
+        public async Task<int> InitializeNewSession(string username)
         {
             // Create new authentication token for user -- SHA256 hash of username concatenated with a random number from 10 to 20 million.
             Random rnd = new();
@@ -162,7 +162,7 @@ namespace ApplicationLayer.Services
                     SessionActive = true,
                     AppUserID = appUserId
                 };
-                _sessionRepo.Create(newSession);
+                await _sessionRepo.Create(newSession);
                 Logger.LogInformation("A new user has logged in for the first time.\n " +
                 "Username: {userName}, Session ID: {sessId}, User ID: {userId}", 
                 newSession.UserName, newSession.SessionId, newSession.AppUserID);

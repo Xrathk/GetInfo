@@ -29,6 +29,7 @@
         <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
     </EditForm>
 
+
     @if (formStatus == FormSubmissionStatus.CurrentlyProcessed)
     {
         <SpinnerLoader />
@@ -66,7 +67,7 @@
         // If credentials were correct, store cookie and login to app
         if (code == 0)
         {
-            var cookieState = AccountOperations.InitializeNewSession(logForm.Username);
+            var cookieState = await AccountOperations.InitializeNewSession(logForm.Username);
             if (cookieState == 0) // Retrieve cookie from server and login
             {
                 formStatus = FormSubmissionStatus.Accepted;
@@ -100,4 +101,5 @@
         await jsRuntime.InvokeAsync<string>("console.log", logForm.Password); 
 
     }
+
 }
